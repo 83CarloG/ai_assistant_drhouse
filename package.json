@@ -1,0 +1,22 @@
+{
+  "dependencies": {
+    "@fastify/static": "^7.0.4",
+    "axios": "^1.7.3",
+    "env-to-config": "^1.4.1",
+    "microservice_node_template": "link:../microservice_node_template/"
+  },
+  "scripts": {
+    "log": "pm2 log",
+    "list": "pm2 list",
+    "flush": "pm2 flush",
+    "start": "pm2 start pm2.config.js && pm2 save && npm run log",
+    "delete": "pm2 delete pm2.config.js && pm2 save",
+    "reload": "pm2 reload pm2.config.js && pm2 save && npm run log",
+    "start:dev": "pm2 start pm2.dev.config.js && pm2 save && npm run log",
+    "delete:dev": "pm2 delete pm2.dev.config.js && pm2 save",
+    "reload:dev": "pm2 reload pm2.dev.config.js && pm2 save && npm run log"
+  },
+  "devDependencies": {
+
+  }
+}

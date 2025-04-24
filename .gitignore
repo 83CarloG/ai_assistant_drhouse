@@ -136,4 +136,5 @@ dist
 .pnp.*
  yarn.lock
  .idea/
+ .logs/
 

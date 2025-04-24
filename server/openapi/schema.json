@@ -1,0 +1,297 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "OpenAPI specification of SmallTalk, the AI Query Tool",
+    "version": "1.0.0",
+    "title": "SmallTalk OpenAPI specification",
+    "contact": {
+      "email": "simone.sacchi@nubilaria.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost",
+      "description": "Local instance"
+    }
+  ],
+  "paths": {
+    "/ping": {
+      "get": {
+        "tags": ["prod"],
+        "responses": {
+          "200": {
+            "description": "Just the pong response",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "ai_nodejs_poc:pong"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prompt-simple": {
+      "post": {
+        "description": "Get a response from the user prompt",
+        "responses": {
+          "200": {
+            "description": "A response created by the Mistral AI POST /chat/completions response",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "SELECT * from users"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "requestBody": {
+          "description": "The user prompt",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "prompt"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "prompt": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "prompt": "Give me the names of all patients visited by a given doctor in July and whose age is greater than 25"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "in": "Header",
+        "name": "Authorization",
+        "description": "Bearer token to access these api endpoints",
+        "scheme": "Bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "responses": {
+      "Success": {
+        "description": "Success response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "status"
+              ],
+              "properties": {
+                "status": {
+                  "enum": [
+                    "OK"
+                  ]
+                },
+                "message": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false,
+              "example": {
+                "status": "OK"
+              }
+            }
+          }
+        }
+      },
+      "SignatureFound": {
+        "description": "One or more signature have been found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "signatures",
+                "message"
+              ],
+              "properties": {
+                "signatures": {
+                  "type": "array"
+                },
+                "message": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false,
+              "example": {
+                "signatures": [
+                  {
+                    "messages": [
+                      {
+                        "message": "Data della verifica 10/07/2024 alle 09:51:37 UTC",
+                        "status": "info"
+                      },
+                      {
+                        "message": "Data di sistema al momento della firma 30/05/2024 alle 15:50:53 UTC",
+                        "status": "info"
+                      },
+                      {
+                        "message": "Certificato scaduto Gianni",
+                        "status": "error"
+                      },
+                      {
+                        "message": "Informazioni di revoca non reperibili o non affidabili Gianni",
+                        "status": "error"
+                      },
+                      {
+                        "message": "La firma è integra e valida",
+                        "status": "ok"
+                      },
+                      {
+                        "message": "Il certificato del firmatario rispetta la Determinazione 147/2019 di Agid",
+                        "status": "ok"
+                      },
+                      {
+                        "message": "Certificato di CA affidabile ArubaPEC EU Qualified Certificates CA G1",
+                        "status": "ok"
+                      },
+                      {
+                        "message": "Certificato scaduto",
+                        "status": "error"
+                      },
+                      {
+                        "message": "Informazioni di revoca non reperibili o non affidabili",
+                        "status": "error"
+                      },
+                      {
+                        "message": "Certificato di CA affidabile",
+                        "status": "ok"
+                      }
+                    ],
+                    "signed_by": "Gianni",
+                    "eidas_validity": false,
+                    "verfication_date": "Wed, 10 Jul 2024 07:51:37 GMT",
+                    "signature_date": "Thu, 30 May 2024 13:50:53 GMT"
+                  }
+                ],
+                "message": "signatures_found"
+              }
+            }
+          }
+        }
+      },
+      "InvalidRequest": {
+        "$ref": "#/components/responses/Unauthorized"
+      },
+      "BadRequest": {
+        "description": "Bad request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "status"
+              ],
+              "properties": {
+                "status": {
+                  "enum": [
+                    "INVALID_URL"
+                  ]
+                },
+                "message": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false,
+              "example": {
+                "status": "INVALID_URL",
+                "message": "URL does not match any application routes"
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Unauthorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "status"
+              ],
+              "properties": {
+                "status": {
+                  "enum": ["UNAUTHORIZED"]
+                },
+                "message": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "integer"
+                }
+              },
+              "additionalProperties": false,
+              "example": {
+                "status": "UNAUTHORIZED",
+                "message": "Unauthorized",
+                "code": 401
+              }
+            }
+          }
+        }
+      },
+      "WrongFileFormat": {
+        "description": "The file format is invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "status"
+              ],
+              "properties": {
+                "status": {
+                  "enum": ["WRONG_FILE_FORMAT"]
+                },
+                "message": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "integer"
+                }
+              },
+              "additionalProperties": false,
+              "example": {
+                "status": "WRONG_FILE_FORMAT",
+                "message": "Incorrect file format",
+                "code": 415
+              }
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+
+
+    }
+  }
+}
+
