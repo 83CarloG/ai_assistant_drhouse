@@ -2,7 +2,7 @@
 
 const path = require("path");
 const process = require("process");
-
+const getResponseFromAiService = require(path.resolve(process.cwd(), "src", "services", "getResponseFromAi"));
 
 module.exports = async function (fastify, openapi) {
 
@@ -17,8 +17,10 @@ module.exports = async function (fastify, openapi) {
                 }
             },
             async (request, reply) => {
+                const {prompt} = request.body;
+                const aiResponse = await getResponseFromAiService(prompt);
+                return reply.send(aiResponse);
 
-                return reply.send('hi');
             });
 
         done();

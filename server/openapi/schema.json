@@ -1,11 +1,11 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "description": "OpenAPI specification of SmallTalk, the AI Query Tool",
+    "description": "Dr. House - AI Assistant",
     "version": "1.0.0",
-    "title": "SmallTalk OpenAPI specification",
+    "title": "Dr. House - AI Assistant",
     "contact": {
-      "email": "simone.sacchi@nubilaria.com"
+      "email": "carlo.colombo@nubilaria.com"
     }
   },
   "servers": [
@@ -43,7 +43,7 @@
               "text/plain": {
                 "schema": {
                   "type": "string",
-                  "example": "SELECT * from users"
+                  "example": "bla bla"
                 }
               }
             }
@@ -73,7 +73,7 @@
                 }
               },
               "example": {
-                "prompt": "Give me the names of all patients visited by a given doctor in July and whose age is greater than 25"
+                "prompt": "What is the capital of Italy?"
               }
             }
           }
