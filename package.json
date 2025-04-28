@@ -3,11 +3,17 @@
     "@fastify/static": "^7.0.4",
     "axios": "^1.7.3",
     "env-to-config": "^1.4.1",
-    "microservice_node_template": "link:../microservice_node_template/"
+    "microservice_node_template": "link:../microservice_node_template/",
+    "redis": "^4.6.13",
+    "@redis/json": "^1.0.6",
+    "@redis/search": "^1.1.8",
+    "csvtojson": "^2.0.10",
+    "@xenova/transformers": "^2.16.0"
   },
   "scripts": {
     "start": "node server/server.js",
-    "dev": "nodemon server/server.js"
+    "dev": "nodemon server/server.js",
+    "load-data": "node src/services/loadData.js"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
