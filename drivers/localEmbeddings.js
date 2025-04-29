@@ -26,7 +26,6 @@ async function getEmbeddingPipeline() {
  * @returns {Promise<number[]|number[][]>} - Embedding vector(s)
  */
 async function createEmbedding(text) {
-    console.log(text)
     try {
         const pipe = await getEmbeddingPipeline();
 

@@ -5,7 +5,7 @@ const process = require("process");
 const { readFile } = require("fs/promises");
 
 const httpDriver = require(path.resolve(process.cwd(), "drivers", "http"));
-const { searchMedicineData } = require(path.resolve(process.cwd(), "src", "services", "vectorSearch"));
+const { searchMedicineData } = require(path.resolve(process.cwd(), "src", "job", "vectorSearch"));
 const DEFAULT_MODEL = "mistral-large-latest";
 
 /**
@@ -33,7 +33,6 @@ function isMedicalQuery(prompt) {
  */
 async function retrieveMedicalContext(prompt) {
     try {
-
         // Search for relevant medical information
         const searchResults = await searchMedicineData(prompt, 3);
 
@@ -47,12 +46,10 @@ async function retrieveMedicalContext(prompt) {
         searchResults.forEach((result, idx) => {
             context += `[Item ${idx + 1}]\n`;
             context += `Medicine: ${result.data.name}\n`;
-            context += `Category: ${result.data.category}\n`;
-            context += `Dosage Form: ${result.data.dosage_form}\n`;
-            context += `Strength: ${result.data.strength}\n`;
+            context += `Composition: ${result.data.composition}\n`;
+            context += `Uses: ${result.data.uses}\n`;
+            context += `Side Effects: ${result.data.side_effects}\n`;
             context += `Manufacturer: ${result.data.manufacturer}\n`;
-            context += `Indication: ${result.data.indication}\n`;
-            context += `Classification: ${result.data.classification}\n\n`;
         });
 
         context += "Use this information if relevant to answer the query.\n";
@@ -90,7 +87,7 @@ module.exports = async function (prompt, userSelectedModel = DEFAULT_MODEL, cust
             finalSystemInstruction = customSystemInstruction;
         }
 
-        console.log(finalSystemInstruction)
+        console.log("Final System Instruction:", finalSystemInstruction);
 
         const response = await httpDriver.post(url, {
             model: userSelectedModel,

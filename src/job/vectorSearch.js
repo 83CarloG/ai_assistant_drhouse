@@ -34,27 +34,25 @@ async function searchMedicineData(query, limit = MAX_RESULTS) {
                 PARAMS: {
                     query_vector: vectorBuffer
                 },
-                RETURN: ['name', 'category', 'dosage_form', 'strength', 'manufacturer', 'indication', 'classification', 'combined_text', 'score'],
+                RETURN: ['name', 'composition', 'uses', 'side_effects', 'manufacturer','combined_text', 'score'],
                 SORTBY: 'score',
                 DIALECT: 2
             }
         );
+
         // Format results for easier consumption
         const formattedResults = results.documents.map(doc => ({
             id: doc.id,
             score: doc.value.score,
             data: {
                 name: doc.value.name,
-                category: doc.value.category,
-                dosage_form: doc.value.dosage_form,
-                strength: doc.value.strength,
+                composition: doc.value.composition,
+                uses: doc.value.uses,
+                side_effects: doc.value.side_effects,
                 manufacturer: doc.value.manufacturer,
-                indication: doc.value.indication,
-                classification: doc.value.classification,
                 combined_text: doc.value.combined_text
             }
         }));
-
 
         return formattedResults;
     } catch (error) {
@@ -78,10 +76,13 @@ async function filterMedicineData(filters, limit = MAX_RESULTS) {
         let query = [];
 
         if (filters.name) query.push(`@name:(${filters.name})`);
-        if (filters.category) query.push(`@category:{${filters.category}}`);
-        if (filters.dosage_form) query.push(`@dosage_form:{${filters.dosage_form}}`);
         if (filters.manufacturer) query.push(`@manufacturer:{${filters.manufacturer}}`);
-        if (filters.classification) query.push(`@classification:{${filters.classification}}`);
+
+        // Add numeric ranges if provided
+        if (filters.min_excellent_review)
+            query.push(`@excellent_review:[${filters.min_excellent_review} +inf]`);
+        if (filters.max_poor_review)
+            query.push(`@poor_review:[0 ${filters.max_poor_review}]`);
 
         // If no filters provided, return all documents
         const queryString = query.length > 0 ? query.join(' ') : '*';
@@ -95,7 +96,7 @@ async function filterMedicineData(filters, limit = MAX_RESULTS) {
                     from: 0,
                     size: limit
                 },
-                RETURN: ['name', 'category', 'dosage_form', 'strength', 'manufacturer', 'indication', 'classification', 'combined_text']
+                RETURN: ['name', 'composition', 'uses', 'side_effects', 'manufacturer', 'combined_text']
             }
         );
 
@@ -104,12 +105,10 @@ async function filterMedicineData(filters, limit = MAX_RESULTS) {
             id: doc.id,
             data: {
                 name: doc.value.name,
-                category: doc.value.category,
-                dosage_form: doc.value.dosage_form,
-                strength: doc.value.strength,
+                composition: doc.value.composition,
+                uses: doc.value.uses,
+                side_effects: doc.value.side_effects,
                 manufacturer: doc.value.manufacturer,
-                indication: doc.value.indication,
-                classification: doc.value.classification,
                 combined_text: doc.value.combined_text
             }
         }));

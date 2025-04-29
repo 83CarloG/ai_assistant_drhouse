@@ -13,7 +13,6 @@ let client = null;
  * @returns {Promise<import('redis').RedisClientType>}
  */
 async function getClient() {
-    console.log(REDIS_URL)
     if (!client) {
         // Create a new client
         console.log(`Connecting to Redis at ${REDIS_URL}...`);

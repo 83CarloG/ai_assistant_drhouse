@@ -44,31 +44,25 @@ async function createIndex(client) {
             console.log(`No existing index found to drop`);
         }
 
-        // Create vector index
+        // Create vector index with schema matching the new dataset structure
         try {
             await client.ft.create(MEDICINE_INDEX, {
                 name: {
                     type: SchemaFieldTypes.TEXT,
                     sortable: true
                 },
-                category: {
-                    type: SchemaFieldTypes.TAG,
-                    sortable: true
+                composition: {
+                    type: SchemaFieldTypes.TEXT,
                 },
-                dosage_form: {
-                    type: SchemaFieldTypes.TAG,
+                uses: {
+                    type: SchemaFieldTypes.TEXT,
                 },
-                strength: {
+                side_effects: {
                     type: SchemaFieldTypes.TEXT,
                 },
                 manufacturer: {
                     type: SchemaFieldTypes.TAG,
-                },
-                indication: {
-                    type: SchemaFieldTypes.TEXT,
-                },
-                classification: {
-                    type: SchemaFieldTypes.TAG,
+                    sortable: true
                 },
                 combined_text: {
                     type: SchemaFieldTypes.TEXT,
@@ -100,7 +94,7 @@ async function processData() {
     let client;
     try {
         // Check if the data file exists
-        const csvFilePath = path.resolve(process.cwd(), 'fixtures', 'dataset_files', 'medicine_dataset_50k.csv');
+        const csvFilePath = path.resolve(process.cwd(), 'fixtures', 'dataset_files', 'medicine_details_11k.csv');
         if (!fs.existsSync(csvFilePath)) {
             console.error(`Error: Medicine dataset not found at ${csvFilePath}`);
             process.exit(1);
@@ -125,8 +119,9 @@ async function processData() {
         const BATCH_SIZE = 5;
         let count = 0;
 
-        // Process a subset for testing
-        const recordsToProcess = jsonArray.slice(0, 10);
+        console.log(jsonArray.length)
+        // Process a subset for testing (you can increase this later)
+        const recordsToProcess = jsonArray.slice(0, jsonArray.length);
         console.log(`Processing ${recordsToProcess.length} records...`);
 
         for (let i = 0; i < recordsToProcess.length; i += BATCH_SIZE) {
@@ -134,7 +129,7 @@ async function processData() {
 
             // Create combined texts for each record in the batch
             const combinedTexts = batch.map(record =>
-                `Name: ${record.Name}. Category: ${record.Category}. Dosage Form: ${record['Dosage Form'] || 'N/A'}. Strength: ${record.Strength || 'N/A'}. Manufacturer: ${record.Manufacturer || 'N/A'}. Indication: ${record.Indication || 'N/A'}. Classification: ${record.Classification || 'N/A'}.`
+                `Name: ${record['Medicine Name'] || 'N/A'}. Composition: ${record.Composition || 'N/A'}. Uses: ${record.Uses || 'N/A'}. Side Effects: ${record.Side_effects || 'N/A'}. Manufacturer: ${record.Manufacturer || 'N/A'}.`
             );
 
             try {
@@ -152,18 +147,15 @@ async function processData() {
                     const embedding = embeddings[idx];
 
                     try {
-                        // IMPORTANT: Use HSET instead of JSON.SET since the index is defined for HASH types
                         // Convert embedding to a buffer for Redis storage
                         const vectorBuffer = Buffer.from(new Float32Array(embedding).buffer);
 
                         await client.hSet(docId, {
-                            name: record.Name || '',
-                            category: record.Category || '',
-                            dosage_form: record['Dosage Form'] || '',
-                            strength: record.Strength || '',
+                            name: record['Medicine Name'] || '',
+                            composition: record.Composition || '',
+                            uses: record.Uses || '',
+                            side_effects: record.Side_effects || '',
                             manufacturer: record.Manufacturer || '',
-                            indication: record.Indication || '',
-                            classification: record.Classification || '',
                             combined_text: combinedText,
                             content_vector: vectorBuffer
                         });
