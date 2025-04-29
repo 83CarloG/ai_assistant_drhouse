@@ -6,6 +6,7 @@ const { readFile } = require("fs/promises");
 
 const httpDriver = require(path.resolve(process.cwd(), "drivers", "http"));
 const { searchMedicineData } = require(path.resolve(process.cwd(), "src", "job", "vectorSearch"));
+const chatHistory = require(path.resolve(process.cwd(), "src", "services", "chatHistory"));
 const DEFAULT_MODEL = "mistral-large-latest";
 
 /**
@@ -60,6 +61,45 @@ async function retrieveMedicalContext(prompt) {
     }
 }
 
+/**
+ * Enhance the prompt with relevant conversation history
+ * @param {string} prompt User prompt
+ * @returns {Promise<string>} Enhanced prompt with history
+ */
+async function enhancePromptWithHistory(prompt) {
+    try {
+        // Get relevant history based on the current prompt
+        const relevantHistory = await chatHistory.getRelevantHistory(prompt, 3);
+
+
+
+        if (!relevantHistory || relevantHistory.length === 0) {
+            return prompt;
+        }
+
+        // Format the history into context
+        let historyContext = "\n\nHere is our previous conversation that might be relevant:\n\n";
+
+        relevantHistory.forEach((exchange, index) => {
+            // Format timestamp to readable date
+            const date = new Date(exchange.timestamp);
+            const formattedDate = date.toLocaleString();
+
+            historyContext += `[${formattedDate}]\n`;
+            historyContext += `User: ${exchange.prompt}\n`;
+            historyContext += `You (Dr. House): ${exchange.response}\n\n`;
+        });
+
+        // Combine with the current prompt
+        historyContext += `Current query: ${prompt}`;
+        return historyContext;
+    } catch (error) {
+        console.error('Error enhancing prompt with history:', error);
+        // If anything fails, return the original prompt
+        return prompt;
+    }
+}
+
 module.exports = async function (prompt, userSelectedModel = DEFAULT_MODEL, customSystemInstruction = "") {
     try {
         const url = "/chat/completions";
@@ -71,6 +111,9 @@ module.exports = async function (prompt, userSelectedModel = DEFAULT_MODEL, cust
         );
 
         let finalSystemInstruction = baseSystemInstruction;
+
+        // Add instruction about using conversation history
+        finalSystemInstruction += "\n\n## Using Conversation History\nI may include relevant parts of our previous conversation. Use this context to provide more personalized and consistent responses. Refer to past exchanges when appropriate, but focus on addressing the current query directly.";
 
         // Check if the query is medical-related and enhance with context if it is
         if (isMedicalQuery(prompt)) {
@@ -87,16 +130,23 @@ module.exports = async function (prompt, userSelectedModel = DEFAULT_MODEL, cust
             finalSystemInstruction = customSystemInstruction;
         }
 
-        console.log("Final System Instruction:", finalSystemInstruction);
+        // Enhance prompt with relevant conversation history
+        const enhancedPrompt = await enhancePromptWithHistory(prompt);
+
+        console.log("system prompt:", finalSystemInstruction);
+        console.log("user prompt:", enhancedPrompt);
 
         const response = await httpDriver.post(url, {
             model: userSelectedModel,
             messages: [
                 {"role": "system", "content": finalSystemInstruction},
-                {"role": "user", "content": prompt},
+                {"role": "user", "content": enhancedPrompt},
             ],
             temperature: 0.2 // Slightly more deterministic for medical information
         });
+
+        // Store the exchange in history
+        await chatHistory.storeExchange(prompt, response.data.choices[0].message.content);
 
         return {
             data: response.data.choices[0].message.content,
