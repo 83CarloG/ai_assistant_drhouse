@@ -17,8 +17,10 @@ module.exports = async function (fastify, openapi) {
                 }
             },
             async (request, reply) => {
-                const {prompt} = request.body;
-                const aiResponse = await getResponseFromAiService(prompt);
+            console.log(request.body)
+                const {prompt, enableDrHouse, ragEnabledHistoryChat, ragEnabledMedicalContext } = request.body;
+            console.log(prompt, enableDrHouse)
+                const aiResponse = await getResponseFromAiService(prompt, enableDrHouse, ragEnabledHistoryChat, ragEnabledMedicalContext);
                 return reply.send(aiResponse);
 
             });

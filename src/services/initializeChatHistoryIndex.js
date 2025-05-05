@@ -1,7 +1,7 @@
 "use strict";
 
 const path = require('path');
-const { getClient } = require(path.resolve(process.cwd(), 'drivers', 'redis'));
+const { getClient, closeConnection } = require(path.resolve(process.cwd(), 'drivers', 'redis'));
 
 // Constants
 const CHAT_HISTORY_PREFIX = 'chat:history:'; // Prefix for individual exchanges
