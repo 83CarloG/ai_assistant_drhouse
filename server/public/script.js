@@ -76,13 +76,13 @@ function updateNavigationButtons() {
     const homeButton = document.getElementById('home-button');
 
     // Update Previous button
-    prevButton.style.display = currentSlide === 1 ? 'none' : 'inline-block';
+    if (prevButton) prevButton.style.display = currentSlide === 1 ? 'none' : 'inline-block';
 
     // Update Next button
-    nextButton.style.display = currentSlide === totalSlides ? 'none' : 'inline-block';
+    if (nextButton) nextButton.style.display = currentSlide === totalSlides ? 'none' : 'inline-block';
 
     // Update Home button
-    homeButton.style.display = currentSlide === 1 ? 'none' : 'inline-block';
+    if (homeButton) homeButton.style.display = currentSlide === 1 ? 'none' : 'inline-block';
 }
 
 /**
@@ -104,14 +104,108 @@ function prevSlide() {
 }
 
 /**
- * Simulate processing a prompt (demo purpose only)
- * This function would normally interact with a backend
+ * Get the input and output elements for the current active slide
+ * @returns {Object} Object containing input and output elements
  */
-function processPrompt() {
-    // In a real implementation, this would send the prompt to the backend
-    // For this demo, we're just showing that the button works
-    console.log("Processing prompt...");
-    alert("In una implementazione reale, questo invierebbe il prompt al backend AI.");
+function getActiveElements() {
+    let inputElement, outputElement, submitButton;
+
+    switch (currentSlide) {
+        case 2: // Basic Prompt
+            inputElement = document.getElementById('promptBaseInput');
+            outputElement = document.getElementById('promptBaseOutput');
+            submitButton = document.querySelector('#slideBasicPrompt .submit-button');
+            break;
+        case 3: // Personality
+            inputElement = document.querySelector('#slidePersonality .input-box');
+            outputElement = document.querySelector('#slidePersonality .output-box');
+            submitButton = document.querySelector('#slidePersonality .submit-button');
+            break;
+        case 5: // RAG
+            inputElement = document.querySelector('#slideRAG .input-box');
+            outputElement = document.querySelector('#slideRAG .output-box');
+            submitButton = document.querySelector('#slideRAG .submit-button');
+            break;
+        default:
+            return null;
+    }
+
+    return { inputElement, outputElement, submitButton };
+}
+
+/**
+ * Process a prompt by sending it to the backend and displaying the response
+ */
+async function processPrompt() {
+    const elements = getActiveElements();
+    if (!elements) return;
+
+    const { inputElement, outputElement, submitButton } = elements;
+
+    // Get prompt text
+    const prompt = inputElement.textContent || inputElement.value;
+    if (!prompt.trim()) {
+        alert("Per favore, inserisci un prompt prima di inviare.");
+        return;
+    }
+
+    // Get configuration based on current slide
+    let enableDrHouse = false;
+    let ragEnabledHistoryChat = false;
+    let ragEnabledMedicalContext = false;
+
+    switch (currentSlide) {
+        case 2: // Basic Prompt
+            // No special flags needed
+            break;
+        case 3: // Personality
+            enableDrHouse = true;
+            break;
+        case 5: // RAG
+            enableDrHouse = true;
+            ragEnabledHistoryChat = true;
+            ragEnabledMedicalContext = true;
+            break;
+        default:
+            break;
+    }
+
+    // Disable submit button and show loading state
+    submitButton.disabled = true;
+    submitButton.textContent = "Elaborazione...";
+    outputElement.textContent = "Dr. House sta pensando...";
+
+    try {
+        // Send request to backend
+        const response = await fetch('/prompt-simple', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                prompt,
+                enableDrHouse,
+                ragEnabledHistoryChat,
+                ragEnabledMedicalContext
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        // Parse and display response
+        const result = await response.json();
+        outputElement.textContent = result.data || 'Nessuna risposta ricevuta.';
+
+    } catch (error) {
+        console.error('Error processing prompt:', error);
+        outputElement.textContent = "Si è verificato un errore durante l'elaborazione della richiesta. Riprova più tardi.";
+    } finally {
+        // Re-enable submit button
+        submitButton.disabled = false;
+        submitButton.textContent = "Invia";
+    }
 }
 
 // Keyboard navigation event handler
