@@ -1,0 +1,275 @@
+<!-- server/public/speech-test.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. House Speech Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #051B2B;
+            color: #ADD8E6;
+        }
+        .chat-container {
+            border: 1px solid #FF5733;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 300px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+        .user-message {
+            background-color: #2C3E50;
+            margin-left: auto;
+            text-align: right;
+        }
+        .house-message {
+            background-color: #34495E;
+            margin-right: auto;
+            position: relative;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+        button {
+            background-color: #FF5733;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:disabled {
+            background-color: #7f7f7f;
+            cursor: not-allowed;
+        }
+        .status {
+            color: #7f7f7f;
+            margin: 10px 0;
+            font-style: italic;
+        }
+        .audio-control {
+            cursor: pointer;
+            margin-left: 10px;
+            color: #FF5733;
+        }
+        h1 {
+            color: #FF5733;
+        }
+        .logo {
+            max-width: 200px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<img src="assets/logo.png" alt="Dr. House Logo" class="logo">
+<h1>Dr. House Speech Interface</h1>
+
+<div class="chat-container" id="chatContainer">
+    <!-- Chat messages will be added here dynamically -->
+</div>
+
+<div class="status" id="status">Ready</div>
+
+<div class="controls">
+    <button id="startButton">Start Speaking</button>
+    <button id="stopButton" disabled>Stop</button>
+    <button id="clearButton">Clear Chat</button>
+</div>
+
+<script>
+    // Speech recognition setup
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        alert("Speech recognition not supported in this browser. Try Chrome or Edge.");
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'it-IT'; // Set to Italian for Dr. House Italian version
+
+    // Elements
+    const chatContainer = document.getElementById('chatContainer');
+    const startButton = document.getElementById('startButton');
+    const stopButton = document.getElementById('stopButton');
+    const clearButton = document.getElementById('clearButton');
+    const statusElement = document.getElementById('status');
+
+    // Variables
+    let isListening = false;
+    let finalTranscript = '';
+
+    // Event listeners
+    startButton.addEventListener('click', startListening);
+    stopButton.addEventListener('click', stopListening);
+    clearButton.addEventListener('click', clearChat);
+
+    // Speech recognition events
+    recognition.onstart = function() {
+        isListening = true;
+        statusElement.textContent = "Listening...";
+        startButton.disabled = true;
+        stopButton.disabled = false;
+    };
+
+    recognition.onresult = function(event) {
+        let interimTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+
+            if (event.results[i].isFinal) {
+                finalTranscript += transcript;
+            } else {
+                interimTranscript += transcript;
+            }
+        }
+
+        // Update status with interim results
+        if (interimTranscript) {
+            statusElement.textContent = "Hearing: " + interimTranscript;
+        }
+    };
+
+    recognition.onend = function() {
+        if (isListening) {
+            // If we're still supposed to be listening, restart
+            recognition.start();
+        } else {
+            startButton.disabled = false;
+            stopButton.disabled = true;
+
+            if (finalTranscript) {
+                // Process the final transcript
+                addMessage(finalTranscript, 'user');
+                sendToAI(finalTranscript);
+            }
+
+            finalTranscript = '';
+            statusElement.textContent = "Ready";
+        }
+    };
+
+    recognition.onerror = function(event) {
+        console.error('Speech recognition error', event.error);
+        statusElement.textContent = "Error: " + event.error;
+        isListening = false;
+        startButton.disabled = false;
+        stopButton.disabled = true;
+    };
+
+    // Functions
+    function startListening() {
+        finalTranscript = '';
+        isListening = true;
+        recognition.start();
+    }
+
+    function stopListening() {
+        isListening = false;
+        recognition.stop();
+    }
+
+    function clearChat() {
+        chatContainer.innerHTML = '';
+    }
+
+    function addMessage(text, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}-message`;
+        messageDiv.textContent = text;
+
+        // Add audio control for House messages
+        if (sender === 'house') {
+            const audioControl = document.createElement('span');
+            audioControl.className = 'audio-control';
+            audioControl.innerHTML = '🔊';
+            audioControl.title = 'Play audio';
+            audioControl.onclick = function() {
+                playAudio(text);
+            };
+            messageDiv.appendChild(audioControl);
+        }
+
+        chatContainer.appendChild(messageDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function sendToAI(prompt) {
+        statusElement.textContent = "Waiting for Dr. House...";
+
+        fetch('/speech/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ prompt })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                addMessage(data.text, 'house');
+                playAudioFromUrl(data.audio_url);
+                statusElement.textContent = "Ready";
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                statusElement.textContent = "Error communicating with Dr. House";
+            });
+    }
+
+    function playAudio(text) {
+        fetch('/speech/generate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ text })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                const audio = new Audio(url);
+                audio.play();
+            })
+            .catch(error => {
+                console.error('Error playing audio:', error);
+            });
+    }
+
+    function playAudioFromUrl(url) {
+        const audio = new Audio(url);
+        audio.play();
+    }
+
+    // Initial message
+    addMessage("Sono il Dottor House. Dimmi cosa ti affligge, e cercherò di non annoiarmi troppo.", 'house');
+</script>
+</body>
+</html>
