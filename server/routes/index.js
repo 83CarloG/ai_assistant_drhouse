@@ -6,6 +6,12 @@ const getResponseFromAiService = require(path.resolve(process.cwd(), "src", "ser
 
 module.exports = async function (fastify, openapi) {
 
+    //Register static file serving
+    fastify.register(require('@fastify/static'), {
+        root: path.join(process.cwd(), 'server', 'public'),
+        prefix: '/'
+    });
+
     const getQuerySchema = await openapi.fastifySchemaFactory("/prompt-simple", "post", "application/json");
 
     fastify.register(function (instance, opts, done) {

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. House AI Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<!-- Slide 1: Home/Introduction -->
+<section class="slide" id="slideHome">
+    <div class="home">
+        <div class="logo"><img src="assets/logo.png" alt="Logo"></div>
+        <h1>Le Basi dell'Intelligenza Artificiale</h1>
+        <h2>Un Esempio Progressivo con Dr.House</h2>
+    </div>
+</section>
+
+<!-- Slide 2: Basic Prompt -->
+<section class="slide" id="slideBasicPrompt" style="display: none;">
+    <div class="content">
+        <div class="left-section">
+            <h1 class="page-title">IL PROMPT BASE<span class="title-icon"> /</span></h1>
+
+            <div class="content-section">
+                <h2 class="section-title">Cos'è un prompt?</h2>
+                <p class="section-text">Un'istruzione o domanda che diamo all'AI per ottenere una risposta diagnostica</p>
+                <p class="section-text">Questa è l'interazione più semplice: un caso clinico riceve una risposta generica</p>
+                <p class="section-text">L'AI risponde solo in base al prompt immediato, senza personalità o memoria dei casi precedenti</p>
+            </div>
+
+            <div class="interaction-box">
+                <span class="user-label">Utente: </span>
+                <div class="input-box" id="promptBaseInput">Paziente con febbre alta, tosse persistente e dolori articolari. Quali sono le possibili diagnosi?</div>
+                <button class="submit-button" onclick="processPrompt()">Invia</button>
+
+                <span class="user-label">Dr. House AI: </span>
+                <div class="output-box" id="promptBaseOutput">
+                    Le possibili diagnosi includono influenza, polmonite, COVID-19, infezioni delle vie respiratorie, o condizioni autoimmuni come l'artrite reumatoide. Si consiglia di eseguire un emocromo completo, radiografia toracica e test specifici per escludere le cause infettive.
+                </div>
+            </div>
+        </div>
+
+        <div class="right-section">
+            <div class="image-content">
+                <div class="image-overlay">
+                    <img src="assets/img_slide2.png" alt="Prompt Base Concept">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Slide 3: Personality & Character -->
+<section class="slide" id="slidePersonality" style="display: none;">
+    <div class="content">
+        <div class="left-section">
+            <h1 class="page-title">AGGIUNGERE TONO E CARATTERISTICHE<span class="title-icon"> /</span></h1>
+
+            <div class="content-section">
+                <h2 class="section-title">Dare Personalità all'AI</h2>
+
+                <h3 class="sub-section-title">Cos'è il tono?</h3>
+                <p class="section-text">Lo stile comunicativo che caratterizza le risposte dell'AI</p>
+
+                <h3 class="sub-section-title">Caratteristiche:</h3>
+                <p class="section-text">Attributi specifici che definiscono il comportamento dell'AI</p>
+
+                <ul class="feature-list">
+                    <li>Ora l'AI ha la personalità sarcastica e brillante del Dr. House</li>
+                    <li>Risponde ancora solo alla domanda immediata, senza contesto o memoria</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="right-section">
+            <div class="code-container">
+                <div class="code-box">
+                    <div class="instructions-content">
+                        <div class="instructions-header">&lt;istruzioni&gt;</div>
+                        <ul class="instructions-list">
+                            <li>Rispondi come il Dr. Gregory House</li>
+                            <li>Usa un tono sarcastico e cinico</li>
+                            <li>Mostra brillantezza diagnostica</li>
+                            <li>Fai riferimenti alla Vicodin o al dolore alla gamba</li>
+                            <li>Sii diretto e brutalmente onesto</li>
+                        </ul>
+                        <div class="instructions-footer">&lt;/istruzioni&gt;</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="interaction-box wide-box">
+                <span class="user-label">Utente: </span>
+                <div class="input-box">Paziente con febbre alta, tosse persistente e dolori articolari. Quali sono le possibili diagnosi?</div>
+                <button class="submit-button" onclick="processPrompt()">Invia</button>
+                <span class="user-label">Dr. House AI: </span>
+                <div class="output-box">Oh fantastico, un altro caso di 'potrebbe essere qualsiasi cosa'. Influenza? Troppo banale. Polmonite? Forse, se siamo fortunati. Lupus? Non è mai lupus... tranne quando lo è. Se i medici che l'hanno mandato qui avessero fatto il loro lavoro, avremmo una radiografia e un emocromo invece di sintomi che potrebbero essere trovati su WebMD. Iniziamo con gli antibiotici ad ampio spettro prima che il paziente inizi a tossire sangue in mezzo alla mia clinica. E qualcuno mi passi la Vicodin, questa gamba mi sta uccidendo quasi quanto l'incompetenza che mi circonda.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Slide 4: Vector Database -->
+<section class="slide" id="slideVectorDB" style="display: none;">
+    <div class="content">
+        <div class="left-section">
+            <h1 class="page-title">DATABASE VETTORIALI<span class="title-icon"> /</span></h1>
+
+            <div class="content-section">
+                <h2 class="section-title">La Base della Memoria Medica</h2>
+
+                <h3 class="sub-section-title">Cos'è un database vettoriale?</h3>
+                <p class="section-text">Un sistema che memorizza farmaci come vettori matematici basati sulle loro proprietà terapeutiche</p>
+
+                <h3 class="sub-section-title">Come funziona:</h3>
+                <ol class="feature-list">
+                    <li>I farmaci vengono convertiti in vettori numerici (<span style="text-decoration: underline;">embedding</span>)</li>
+                    <li>Ogni medicinale è rappresentato come un punto in uno spazio multidimensionale</li>
+                    <li>Farmaci con effetti simili si trovano vicini in questo spazio</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="right-section">
+            <div class="vector-plot-container">
+                <div class="vector-title">Similarità tra Farmaci</div>
+
+                <div class="vector-y-axis">
+                    Effetto Antiinfiammatorio →
+                </div>
+
+                <div class="vector-plot">
+                    <div class="vector-x-axis">Effetto Antidolorifico →</div>
+                    <div class="grid-line horizontal"></div>
+                    <div class="grid-line vertical"></div>
+
+                    <!-- Medicine dots -->
+                    <div class="medicine-point ibuprofen" style="top: 25%; left: 62%;">
+                        <div class="med-dot ibuprofen-color"></div>
+                        <div class="med-label">Ibuprofene [0.6, 0.9]</div>
+                    </div>
+
+                    <div class="medicine-point paracetamol" style="top: 45%; left: 71%;">
+                        <div class="med-dot paracetamol-color"></div>
+                        <div class="med-label">Paracetamolo [0.7, 0.2]</div>
+                    </div>
+
+                    <div class="medicine-point diazepam" style="top: 80%; left: 22%;">
+                        <div class="med-dot diazepam-color"></div>
+                        <div class="med-label">Diazepam [0.2, 0.1]</div>
+                    </div>
+                </div>
+
+                <div class="similarity-data">
+                    <div class="similarity-title">Similarità (Coseno):</div>
+                    <div class="similarity-values">
+                        <div class="sim-item">
+                            Paracetamolo → Ibuprofene: <span class="sim-value">0.77</span>
+                        </div>
+                        <div class="sim-item">
+                            Paracetamolo → Diazepam: <span class="sim-value">0.28</span>
+                        </div>
+                        <div class="sim-item">
+                            Ibuprofene → Diazepam: <span class="sim-value">0.24</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Slide 5: RAG (Retrieval-Augmented Generation) -->
+<section class="slide" id="slideRAG" style="display: none;">
+    <div class="content">
+        <div class="left-section">
+            <h1 class="page-title">Aggiungere Memoria con RAG<span class="title-icon"> /</span></h1>
+
+            <div class="content-section">
+                <h2 class="section-title">Retrieval Augmented Generation</h2>
+
+                <h3 class="sub-section-title">Cos'è RAG?</h3>
+                <p class="section-text">Un sistema RAG che combina una base di conoscenza medica e lo storico delle conversazioni con il paziente per supportare la generazione di diagnosi accurate.</p>
+
+                <h3 class="sub-section-title">Come funziona:</h3>
+                <ol class="feature-list">
+                    <li>I sintomi forniti dal paziente vengono trasformati in un vettore semantico</li>
+                    <li>Il sistema effettua una ricerca di casi clinici simili in un database vettoriale</li>
+                    <li>Consulta lo storico delle conversazioni precedenti con il paziente</li>
+                    <li>L'IA elabora una diagnosi integrando le informazioni recuperate e il contesto attuale</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="right-section">
+            <div class="rag-system-container">
+                <div class="rag-diagram">
+                    <!-- Query Box -->
+                    <div class="rag-query-box">
+                        <div class="rag-box-title">Query Utente</div>
+                    </div>
+
+                    <!-- Arrow Down -->
+                    <div class="rag-arrow-down"></div>
+
+                    <!-- RAG Process Area -->
+                    <div class="rag-process-area">
+                        <div class="rag-literature-box">
+                            <div class="rag-box-title">Letteratura Medica</div>
+                            <br>
+                            <div class="rag-box-title">Storico chat</div>
+                            <div class="rag-horizontal-line rag-line-right"></div>
+                        </div>
+
+                        <div class="rag-circle">RAG</div>
+
+                        <div class="rag-diagnosis-box">
+                            <div class="rag-horizontal-line rag-line-left"></div>
+                            <div class="rag-box-title">Diagnosi</div>
+                        </div>
+                    </div>
+
+                    <!-- Database Section -->
+                    <div class="rag-database-section">
+                        <div class="rag-database-title">Database:</div>
+                        <div class="rag-database-content">[Casi clinici rari, Studi su avvelenamenti, Articoli su malattie tropicali, Letteratura su malattie autoimmuni...]</div>
+                    </div>
+
+                    <div class="interaction-box wide-box">
+                        <span class="user-label">Utente: </span>
+                        <div class="input-box">Paziente con febbre alta, tosse persistente e dolori articolari. Quali sono le possibili diagnosi?</div>
+                        <button class="submit-button" onclick="processPrompt()">Invia</button>
+                        <span class="user-label">Dr. House AI: </span>
+                        <div class="output-box">Oh fantastico, un altro caso di 'potrebbe essere qualsiasi cosa'. Influenza? Troppo banale. Polmonite? Forse, se siamo fortunati. Lupus? Non è mai lupus... tranne quando lo è. Se i medici che l'hanno mandato qui avessero fatto il loro lavoro, avremmo una radiografia e un emocromo invece di sintomi che potrebbero essere trovati su WebMD. Iniziamo con gli antibiotici ad ampio spettro prima che il paziente inizi a tossire sangue in mezzo alla mia clinica. E qualcuno mi passi la Vicodin, questa gamba mi sta uccidendo quasi quanto l'incompetenza che mi circonda.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Slide 6: The Complete AI System -->
+<section class="slide" id="slideCompleteAI" style="display: none;">
+    <div class="content">
+        <div class="left-section">
+            <h1 class="page-title">L'AI COMPLETA<span class="title-icon"> /</span></h1>
+
+            <div class="content-section">
+                <h2 class="section-title">Integrare Tutti gli Elementi</h2>
+
+                <h3 class="sub-section-title">Sistema Dr. House Completo:</h3>
+                <ul class="feature-list">
+                    <li><strong>Prompt Base:</strong> Gestisce l'interazione diagnostica fondamentale</li>
+                    <li><strong>Tono e Caratteristiche:</strong> Comunica con il sarcasmo di House</li>
+                    <li><strong>Database Vettoriale:</strong> Contiene vasta letteratura medica e casi rari</li>
+                    <li><strong>Sistema RAG:</strong> Recupera casi clinici simili e ricerca medica</li>
+                    <li><strong>Memoria Conversazionale:</strong> Ricorda gli sviluppi del caso in corso</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="right-section">
+            <div class="ai-complete-container">
+                <div class="ai-diagram">
+                    <!-- Centered image with tighter spacing -->
+                    <img src="assets/rag_image.png" alt="Dr. House AI System Diagram" style="max-width: 85%; margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto;">
+
+                    <!-- Example Context Box -->
+                    <div class="context-box">
+                        <div class="context-user">Schema del sistema RAG per diagnosi mediche: la risposta dell'IA è generata integrando la query del paziente, la memoria storica delle chat, una base di conoscenza medica e la personalità del Dr. House.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Updated Last Slide with Quote and Credits -->
+<section class="slide" id="slideLast" style="display: none;">
+    <div class="content">
+        <div class="left-section">
+            <h1 class="page-title">IL DR. GREGORY HOUSE<span class="title-icon"> /</span></h1>
+
+            <div class="content-section">
+                <h2 class="section-title">Genio Diagnostico Anticonvenzionale</h2>
+
+                <div class="quote-container">
+                    <div class="quotation-mark">
+                        <img src="assets/quote_img.png" alt="Quotation Mark" class="quote-icon">
+                    </div>
+                    <div class="house-quotes">
+                        <p class="quote-text">Quasi tutti mentono.</p>
+                        <p class="quote-text">La verità conta, la risposta conta.</p>
+                        <p class="quote-text">Se nessun altro può trovarla, è compito mio.</p>
+                        <p class="quote-text">La verità mi interessa molto di più di quello che pensano gli altri di me.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="credits">
+                Credits - House M.D, TV Series 2004-2012
+            </div>
+        </div>
+
+        <div class="right-section">
+            <!-- This will contain the image of Dr. House -->
+            <!-- The background image is applied via CSS to the entire slide -->
+        </div>
+    </div>
+</section>
+
+<!-- Navigation Controls -->
+<!--<div class="navigation">-->
+<!--    <button id="home-button" class="nav-button" onclick="goToSlide(1)" style="display: none;">Home</button>-->
+<!--    <button id="prev-button" class="nav-button" onclick="prevSlide()" style="display: none;">Indietro</button>-->
+<!--    <button id="next-button" class="nav-button" onclick="nextSlide()">Avanti</button>-->
+<!--</div>-->
+
+<script src="script.js"></script>
+</body>
+</html>

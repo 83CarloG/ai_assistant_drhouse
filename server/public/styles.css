@@ -1,0 +1,946 @@
+/**
+ * Dr. House AI Assistant - Presentation Styles
+ *
+ * This stylesheet defines the visual presentation of the Dr. House AI
+ * presentation. It is organized by component type and slide.
+ */
+
+/* ===== CSS VARIABLES ===== */
+:root {
+    /* Colors */
+    --color-primary: #959BA5;
+    --color-accent: #FF5733;
+    --color-ai-text: #ADD8E6;
+    --color-background-dark: #051B2B;
+    --color-background-light: #ffffff;
+    --color-border: var(--color-accent);
+
+    /* Fonts */
+    --font-primary: Arial, sans-serif;
+    --font-monospace: 'Courier New', Courier, monospace;
+
+    /* Font sizes */
+    --font-size-normal: 1.5rem;
+    --font-size-large: 2.5rem;
+    --font-size-xlarge: 3rem;
+
+    /* Spacing */
+    --spacing-small: 10px;
+    --spacing-medium: 20px;
+    --spacing-large: 30px;
+}
+
+/* ===== BASE STYLES ===== */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-primary);
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+h1 {
+    font-size: var(--font-size-xlarge);
+}
+
+h2 {
+    font-size: var(--font-size-large);
+}
+
+p {
+    font-size: var(--font-size-normal);
+    color: var(--color-primary);
+}
+
+.title-icon {
+    color: var(--color-accent);
+}
+
+/* ===== SLIDE LAYOUT ===== */
+.slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    transition: opacity 0.5s ease;
+}
+
+.content {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===== HOME SLIDE ===== */
+#slideHome {
+    background: url('assets/background_1.png') no-repeat center center / cover;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+#slideHome .home {
+    background-color: var(--color-background-light);
+    position: absolute;
+    top: 20%;
+    left: 2%;
+    text-align: left;
+    color: black;
+    padding: var(--spacing-medium);
+    max-width: 60%;
+}
+
+#slideHome h2 {
+    color: var(--color-accent);
+}
+
+.logo {
+    text-align: left;
+    margin-bottom: var(--spacing-medium);
+}
+
+.logo img {
+    width: 50%;
+}
+
+/* ===== CONTENT SLIDES ===== */
+#slideBasicPrompt,
+#slidePersonality,
+#slideVectorDB, #slideRAG, #slideCompleteAI {
+    background-color: var(--color-background-dark);
+}
+
+/* Left section - Content */
+.left-section {
+    width: 50%;
+    height: 100vh;
+    padding: var(--spacing-large);
+    display: flex;
+    flex-direction: column;
+}
+
+.left-section h1 {
+    color: var(--color-primary);
+}
+
+.content-section {
+    width: 90%;
+    margin-bottom: var(--spacing-large);
+}
+
+.section-title {
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-small);
+}
+
+.sub-section-title {
+    color: var(--color-accent);
+    font-size: 1.8rem;
+    margin-bottom: var(--spacing-small);
+    margin-top: var(--spacing-medium);
+}
+
+.section-text {
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-small);
+}
+
+.feature-list {
+    color: var(--color-primary);
+    font-size: var(--font-size-normal);
+    padding-left: 30px;
+}
+
+.feature-list li {
+    margin-bottom: 15px;
+}
+
+/* ===== INTERACTION BOX ===== */
+.interaction-box {
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+}
+
+.user-label {
+    color: var(--color-ai-text);
+    font-size: var(--font-size-normal);
+}
+
+.input-box,
+.output-box {
+    width: 100%;
+    background-color: var(--color-background-dark);
+    color: var(--color-ai-text);
+    border: 1px solid var(--color-primary);
+    border-radius: 5px;
+    padding: var(--spacing-medium);
+    font-family: var(--font-monospace);
+    margin-bottom: var(--spacing-medium);
+    resize: none;
+}
+
+.submit-button {
+    background-color: var(--color-accent);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: var(--font-size-normal);
+    align-self: center;
+}
+
+.submit-button:hover {
+    background-color: #E64A19;
+}
+
+/* ===== RIGHT SECTION ===== */
+.right-section {
+    width: 50%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--spacing-large);
+}
+
+/* Image Content */
+.image-content {
+    position: relative;
+    width: 1000%;
+    height: 75%;
+    margin: 15px 0 0 15px; /* Space for the offset border */
+}
+
+.image-content::before {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: -15px;
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--color-accent);
+    z-index: 0;
+}
+
+.image-overlay {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.image-overlay img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* ===== CODE BOX STYLING ===== */
+.code-container {
+    width: 90%;
+    margin-bottom: 20px;
+    background-color: var(--color-background-dark);
+    border: 1px solid var(--color-accent);
+    border-radius: 5px;
+    position: relative;
+    box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+.code-box {
+    padding: 20px;
+    overflow: auto;
+}
+
+.instructions-content {
+    color: var(--color-ai-text);
+    font-family: var(--font-monospace);
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.instructions-header,
+.instructions-footer {
+    margin: 0;
+    padding: 0;
+    color: var(--color-ai-text);
+}
+
+.instructions-list {
+    list-style-type: none;
+    padding-left: 20px;
+    margin: 10px 0;
+}
+
+.instructions-list li {
+    position: relative;
+    padding-left: 15px;
+    margin-bottom: 5px;
+    color: var(--color-ai-text);
+}
+
+.instructions-list li::before {
+    content: "-";
+    position: absolute;
+    left: 0;
+    color: var(--color-ai-text);
+}
+
+/* Right section interaction box customizations */
+.right-section .interaction-box {
+    width: 90%;
+    margin-top: 30px;
+}
+
+.wide-box .input-box,
+.wide-box .output-box {
+    width: 100%;
+    max-height: none;
+    overflow-y: auto;
+}
+
+.right-section .user-label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Personality slide layout */
+#slidePersonality .right-section {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Remove interactive styling from right section boxes */
+.right-section .interaction-box .input-box,
+.right-section .interaction-box .output-box {
+    cursor: default;
+}
+
+/* ===== VECTOR PLOT STYLING ===== */
+.vector-plot-container {
+    width: 96%;
+    height: 85%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background-color: var(--color-background-dark);
+    border: 1px solid var(--color-accent);
+    color: var(--color-ai-text);
+}
+
+.vector-title {
+    text-align: center;
+    font-size: 28px;
+    color: var(--color-ai-text);
+    padding: 20px 0;
+}
+
+.vector-y-axis {
+    position: absolute;
+    left: 15px;
+    top: 60%;
+    transform: rotate(-90deg) translateX(24px);
+    transform-origin: left center;
+    color: var(--color-ai-text);
+    font-size: 16px;
+    white-space: nowrap;
+}
+
+.vector-plot {
+    position: relative;
+    margin: 30px;
+    flex-grow: 1;
+    border: 1px solid rgba(173, 216, 230, 0.3);
+}
+
+.vector-x-axis {
+    position: absolute;
+    bottom: -27px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--color-ai-text);
+    font-size: 16px;
+    white-space: nowrap;
+}
+
+.grid-line {
+    position: absolute;
+    background-color: rgba(173, 216, 230, 0.3);
+}
+
+.grid-line.horizontal {
+    width: 100%;
+    height: 1px;
+    top: 50%;
+}
+
+.grid-line.vertical {
+    height: 100%;
+    width: 1px;
+    left: 50%;
+}
+
+/* Medicine points on the vector plot */
+.medicine-point {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transform: translate(-50%, -50%);
+}
+
+.med-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+/* Medicine dot colors */
+.paracetamol-color {
+    background-color: #5DADE2; /* Blue */
+}
+
+.ibuprofen-color {
+    background-color: #E74C3C; /* Red */
+}
+
+.diazepam-color {
+    background-color: #27AE60; /* Green */
+}
+
+.med-label {
+    color: var(--color-ai-text);
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+/* Similarity data section */
+.similarity-data {
+    padding: 15px 20px;
+    border-top: 1px solid rgba(173, 216, 230, 0.3);
+}
+
+.similarity-title {
+    color: var(--color-accent);
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.similarity-values {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.sim-item {
+    color: var(--color-ai-text);
+    font-size: 14px;
+    margin-right: 20px;
+}
+
+.sim-value {
+    color: var(--color-accent);
+    font-weight: bold;
+}
+
+/* ===== RAG SLIDE STYLING ===== */
+
+/* RAG System Container */
+.rag-system-container {
+    width: 96%;
+    height: 85%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background-color: var(--color-background-dark);
+    border: 1px solid var(--color-accent);
+    color: var(--color-ai-text);
+    padding: 15px;
+}
+
+.rag-diagram {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Query Box */
+.rag-query-box {
+    background-color: var(--color-background-dark);
+    border: 1px solid var(--color-accent);
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+    align-self: center;
+    min-width: 300px;
+}
+
+.rag-box-title {
+    color: var(--color-accent);
+    font-size: 18px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.rag-content {
+    color: var(--color-ai-text);
+    font-size: 16px;
+}
+
+/* Arrow */
+.rag-arrow-down {
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 20px solid var(--color-accent);
+    align-self: center;
+    margin-bottom: 20px;
+}
+
+/* Process Area */
+.rag-process-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 0 30px;
+}
+
+.rag-literature-box,
+.rag-diagnosis-box {
+    background-color: var(--color-background-dark);
+    border: 1px solid var(--color-accent);
+    border-radius: 5px;
+    padding: 15px;
+    text-align: center;
+    min-width: 150px;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+}
+
+.rag-circle {
+    background-color: var(--color-background-dark);
+    border: 2px solid var(--color-accent);
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-accent);
+    font-weight: bold;
+    font-size: 18px;
+    position: relative;
+}
+
+/* Connecting lines between elements */
+.rag-horizontal-line {
+    position: absolute;
+    height: 2px;
+    background-color: var(--color-accent);
+    top: 50%;
+    width: 135px;
+}
+
+.rag-line-left {
+    right: 100%;
+}
+
+.rag-line-right {
+    left: 100%;
+}
+/* Add arrows to the lines */
+.rag-line-left::after{
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+}
+.rag-line-right::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+}
+
+/* Arrow pointing right (for left-to-right line) */
+.rag-line-right::after {
+    border-width: 6px 0 6px 8px;
+    border-color: transparent transparent transparent var(--color-accent);
+    top: -5px;
+    right: 1px;
+}
+
+/* Arrow pointing left (for right-to-left line) */
+.rag-line-left::after {
+    border-width: 6px 0 6px 8px;
+    border-color: transparent transparent transparent var(--color-accent);
+    top: -5px;
+    left: 129px;
+}
+/* Database Section */
+.rag-database-section {
+    background-color: rgba(5, 27, 43, 0.7);
+    border: 1px dashed var(--color-ai-text);
+    border-radius: 5px;
+    padding: 15px;
+    margin: 0 20px 20px 20px;
+}
+
+.rag-database-title {
+    color: var(--color-ai-text);
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: inline-block;
+}
+
+.rag-database-content {
+    color: var(--color-ai-text);
+    font-family: var(--font-monospace);
+    font-size: 14px;
+    line-height: 1.5;
+    display: inline;
+    margin-left: 10px;
+}
+
+/* User Interaction Section */
+.rag-user-section {
+    margin: 25px 20px 10px 20px;
+}
+
+.rag-user-title {
+    color: var(--color-ai-text);
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.rag-user-input {
+    background-color: var(--color-background-dark);
+    border: 1px solid var(--color-primary);
+    border-radius: 5px;
+    padding: 15px;
+    color: var(--color-ai-text);
+    font-family: var(--font-monospace);
+    font-size: 14px;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+/* System Note */
+.system-note {
+    font-family: var(--font-monospace);
+    color: #8F9BBA; /* Light blue-gray color */
+    font-style: italic;
+    font-size: 14px;
+    margin: 10px 0 15px 0;
+    display: block;
+}
+
+/* Send Button */
+.rag-send-button {
+    background-color: var(--color-accent);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 25px;
+    margin: 5px 0 15px 0;
+    font-size: 16px;
+    cursor: pointer;
+    align-self: center;
+    display: inline-block;
+}
+
+.rag-send-button:hover {
+    background-color: #E64A19;
+}
+
+/* RAG AI Response Section */
+.rag-ai-section {
+    margin-top: 15px;
+}
+
+.rag-ai-title {
+    color: var(--color-ai-text);
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.rag-ai-response {
+    background-color: var(--color-background-dark);
+    border: 1px solid var(--color-primary);
+    border-radius: 5px;
+    padding: 15px;
+    color: var(--color-ai-text);
+    font-family: var(--font-monospace);
+    font-size: 14px;
+    width: 100%;
+    line-height: 1.4;
+}
+
+/* System Note */
+.system-note {
+    font-family: var(--font-monospace);
+    color: #8F9BBA; /* Light blue-gray color */
+    font-style: italic;
+    font-size: 14px;
+    margin: 5px 0 15px 0;
+}
+
+
+/* ===== COMPLETE AI SYSTEM SLIDE STYLING ===== */
+
+.ai-complete-container {
+    width: 96%;
+    height: 85%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background-color: var(--color-background-dark);
+    border: 1px solid var(--color-accent);
+    color: var(--color-ai-text);
+    padding: 15px;
+}
+
+.ai-diagram {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* AI Components */
+.ai-component {
+    position: absolute;
+    background-color: var(--color-accent);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-weight: bold;
+    padding: 10px;
+    width: 120px;
+    height: 120px;
+    z-index: 2;
+}
+
+/* Core Component - Center */
+.ai-core {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+}
+
+.core {
+    width: 140px;
+    height: 140px;
+}
+
+/* Component Positions */
+.personality {
+    top: 15%;
+    left: 30%;
+}
+
+.database {
+    top: 15%;
+    right: 30%;
+}
+
+.memory {
+    bottom: 30%;
+    right: 20%;
+}
+
+.rag {
+    bottom: 30%;
+    left: 20%;
+}
+
+/* Connection Lines */
+.ai-connection {
+    position: absolute;
+    background-color: white;
+    height: 2px;
+    z-index: 1;
+}
+
+.personality-connection {
+    width: 120px;
+    top: 35%;
+    left: 38%;
+    transform: rotate(-40deg);
+}
+
+.database-connection {
+    width: 120px;
+    top: 35%;
+    right: 38%;
+    transform: rotate(40deg);
+}
+
+.memory-connection {
+    width: 120px;
+    bottom: 35%;
+    right: 35%;
+    transform: rotate(-40deg);
+}
+
+.rag-connection {
+    width: 120px;
+    bottom: 35%;
+    left: 35%;
+    transform: rotate(40deg);
+}
+
+/* Last Slide Styling */
+#slideLast {
+    background: #051B2B url('assets/last_slide.png') no-repeat center center / cover;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+.quote-container {
+    display: flex;
+    margin-top: 30px;
+    align-items: flex-start;
+}
+
+.quotation-mark {
+    flex: 0 0 100px;
+    margin-right: 20px;
+}
+
+.quote-icon {
+    width: 100px;
+    height: auto;
+}
+
+.house-quotes {
+    flex: 1;
+}
+
+.quote-text {
+    color: var(--color-primary);
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    line-height: 1.3;
+}
+
+.credits {
+    font-size: 1.2rem;
+    color: var(--color-primary);
+    position: absolute;
+    bottom: 30px;
+    left: 30px;
+}
+
+/* Context Box */
+.context-box {
+    position: absolute;
+    bottom: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    background-color: rgba(5, 27, 43, 0.7);
+    border: 1px dashed var(--color-ai-text);
+    border-radius: 5px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.context-title {
+    color: var(--color-ai-text);
+    font-family: var(--font-monospace);
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.context-user {
+    color: var(--color-ai-text);
+    font-family: var(--font-monospace);
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+/* ===== NAVIGATION BUTTONS ===== */
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 100;
+}
+
+.nav-button {
+    background-color: var(--color-accent);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+.nav-button:hover {
+    background-color: #E64A19;
+}
+
+/* Section header consistency */
+#slidePersonality .left-section h2,
+#slideVectorDB .left-section h2 {
+    color: var(--color-primary);
+}
+
+/* ===== RESPONSIVE STYLES ===== */
+@media (max-width: 1200px) {
+    .content {
+        flex-direction: column;
+    }
+
+    .left-section,
+    .right-section {
+        width: 90%;
+        height: auto;
+    }
+
+    .image-content {
+        height: 60vh;
+    }
+
+    /* Adjust navigation for smaller screens */
+    .navigation {
+        bottom: 10px;
+        right: 10px;
+    }
+
+    .nav-button {
+        padding: 8px 15px;
+        font-size: 14px;
+    }
+}
