@@ -4,40 +4,13 @@ const path = require("path");
 const process = require("process");
 const { readFile, writeFile } = require("fs/promises");
 
+const config = require(path.resolve(process.cwd(), "config"));
 const httpDriver = require(path.resolve(process.cwd(), "drivers", "http"));
 const chatHistory = require(path.resolve(process.cwd(), "src", "operations", "chatHistory"));
 const enhancePromptWithHistoryJob = require(path.resolve(process.cwd(), "src", "jobs", "enhancePromptWithHistory"));
 const retrieveMedicalContextOperation = require(path.resolve(process.cwd(),"src", "operations", "retrieveMedicalContext"));
-const DEFAULT_MODEL = "mistral-large-latest";
+const medicalQueryDetection = require(path.resolve(process.cwd(), "src", "features", "medicalQueryDetection"));
 
-/**
- * Analyzes a prompt to determine if it's medical-related
- *
- * @param {string} prompt - User prompt
- * @returns {boolean} - True if medical-related
- */
-function isMedicalQuery(prompt) {
-    const medicalKeywords = [
-        // English keywords
-        'medicine', 'drug', 'medication', 'dosage', 'symptom', 'diagnosis', 'treatment',
-        'disease', 'illness', 'condition', 'prescription', 'side effect', 'interact',
-        'pill', 'tablet', 'capsule', 'injection', 'dose', 'therapy', 'medicate',
-
-        // Italian medical keywords
-        'medicina', 'farmaco', 'medicinale', 'dosaggio', 'sintomo', 'diagnosi', 'trattamento',
-        'malattia', 'condizione', 'prescrizione', 'ricetta', 'effetto collaterale', 'interazione',
-        'pillola', 'compressa', 'capsula', 'iniezione', 'dose', 'terapia', 'medicare',
-        'cura', 'guarire', 'rimedio', 'integratore', 'vitamina', 'minerale', 'inalatore',
-        'gocce', 'pomata', 'crema', 'sciroppo', 'cerotto', 'efficacia', 'funziona per',
-        'cosa dovrei prendere', 'cosa posso usare', 'cosa aiuta con', 'posologia',
-        'controindicazioni', 'indicazioni', 'foglietto illustrativo', 'bugiardino',
-        'antidolorifico', 'antibiotico', 'antiinfiammatorio', 'antipiretico',
-        'farmacia', 'farmacista', 'dottore', 'febbre', 'dolore', 'infezione'
-    ];
-
-    const lowercasePrompt = prompt.toLowerCase();
-    return medicalKeywords.some(keyword => lowercasePrompt.includes(keyword));
-}
 
 /**
  * Enhance the prompt with relevant conversation history
@@ -45,7 +18,7 @@ function isMedicalQuery(prompt) {
  * @returns {Promise<string>} Enhanced prompt with history
  */
 
-module.exports = async function (prompt, enableDrHouse = false, ragEnabledHistoryChat = false, ragEnabledMedicalContext = false, userSelectedModel = DEFAULT_MODEL,) {
+module.exports = async function (prompt, enableDrHouse = false, ragEnabledHistoryChat = false, ragEnabledMedicalContext = false, userSelectedModel = config.MISTRAL_DEFAULT_MODEL,) {
     console.log(prompt, userSelectedModel, enableDrHouse, ragEnabledHistoryChat, ragEnabledMedicalContext);
     try {
         const url = "/chat/completions";
@@ -62,8 +35,7 @@ module.exports = async function (prompt, enableDrHouse = false, ragEnabledHistor
             finalSystemInstruction = baseSystemInstruction;
 
         }
-
-        if (isMedicalQuery(prompt) && ragEnabledMedicalContext) {
+        if (medicalQueryDetection(prompt) && ragEnabledMedicalContext) {
             const medicalContext = await retrieveMedicalContextOperation(prompt);
 
             if (medicalContext) {
@@ -77,7 +49,6 @@ module.exports = async function (prompt, enableDrHouse = false, ragEnabledHistor
             prompt = await enhancePromptWithHistoryJob(prompt);
         }
 
-
         // console.log("system prompt:", finalSystemInstruction);
         // console.log("user prompt:", enhancedPrompt);
 
@@ -85,7 +56,6 @@ module.exports = async function (prompt, enableDrHouse = false, ragEnabledHistor
                                 ## User Prompt:\n ${prompt}`;
 
         await writeFile(path.resolve(process.cwd(), "currentPrompt.txt"), fullQuestion)
-        //await writeFile(path.resolve(process.cwd(), "currentPrompt.txt"), finalSystemInstruction)
 
         const response = await httpDriver.post(url, {
             model: userSelectedModel,
