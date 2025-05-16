@@ -12,7 +12,7 @@
     <div class="home">
         <div class="logo"><img src="assets/logo.png" alt="Logo"></div>
         <h1>Le Basi dell'Intelligenza Artificiale</h1>
-        <h2>Un Esempio Progressivo con Dr.House</h2>
+        <h2>Un Esempio con Dr.House</h2>
     </div>
 </section>
 
@@ -35,9 +35,7 @@
                 <button class="submit-button" onclick="processPrompt()">Invia</button>
 
                 <span class="user-label">Dr. House AI: </span>
-                <div class="output-box" id="promptBaseOutput">
-                    Le risposte del Dr. House appariranno qui.
-                </div>
+                <div class="output-box" id="promptBaseOutput">Le risposte del Dr. House appariranno qui.</div>
             </div>
         </div>
 
@@ -275,6 +273,49 @@
         </div>
     </div>
 </section>
+<!-- Slide 7: Speech Interface -->
+<section class="slide" id="slideSpeech" style="display: none;">
+    <div class="content">
+        <div class="left-section">
+            <h1 class="page-title">INTERFACCIA VOCALE<span class="title-icon"> /</span></h1>
+
+            <div class="content-section">
+                <h2 class="section-title">Dr. House che parla</h2>
+
+                <h3 class="sub-section-title">Text-to-Speech (TTS):</h3>
+                <p class="section-text">Trasforma il testo generato dall'IA in parlato con la voce di Dr. House</p>
+
+                <h3 class="sub-section-title">Speech-to-Text (STT):</h3>
+                <p class="section-text">Converte la voce dell'utente in testo per interagire con l'IA</p>
+
+                <h3 class="sub-section-title">Componenti:</h3>
+                <ul class="feature-list">
+                    <li><strong>Riconoscimento vocale:</strong> Utilizza le API Web Speech per ascoltare l'utente</li>
+                    <li><strong>Sintesi vocale:</strong> Usa l'AI per generare risposte audio con la voce di House</li>
+                    <li><strong>Elaborazione con RAG:</strong> Mantiene tutte le funzionalità della versione testuale</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="right-section">
+            <div class="chat-container" id="speechChatContainer" style="background-color: #051B2B; border: 1px solid #FF5733; border-radius: 10px; padding: 20px; height: 60%; overflow-y: auto; margin-bottom: 20px;">
+                <!-- Chat messages will be added here dynamically -->
+                <div class="message house-message">
+                    Sono il Dottor House. Dimmi cosa ti affligge, e cercherò di non annoiarmi troppo.
+                    <span class="audio-control" onclick="playSpeechAudio(this.parentElement.textContent)">🔊</span>
+                </div>
+            </div>
+
+            <div class="status" id="speechStatus" style="color: #7f7f7f; margin: 10px 0; font-style: italic;">Ready</div>
+
+            <div class="controls" style="display: flex; justify-content: space-evenly; margin-top: 20px; width: 100%">
+                <button id="startSpeechButton" class="submit-button">Inizia a Parlare</button>
+                <button id="stopSpeechButton" class="submit-button" disabled>Stop</button>
+                <button id="clearSpeechButton" class="submit-button">Cancella Chat</button>
+            </div>
+        </div>
+    </div>
+</section>
 <!-- Updated Last Slide with Quote and Credits -->
 <section class="slide" id="slideLast" style="display: none;">
     <div class="content">
@@ -298,7 +339,17 @@
             </div>
 
             <div class="credits">
-                Credits - House M.D, TV Series 2004-2012
+                Credits
+                <br>
+                - House M.D, TV Series 2004-2012
+                <br>
+                - Tecnologie RAG: Paper "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks" (Lewis et al., 2020)
+                <br>
+                - Database vettoriali: Redis Vector Database, documentazione tecnica
+                <br>
+                - Prompt Engineering: "Building Systems with the ChatGPT API" (OpenAI, 2023)
+                <br>
+                - Text-to-Speech: Documentazione ElevenLabs API
             </div>
         </div>
 
@@ -308,6 +359,7 @@
         </div>
     </div>
 </section>
+
 
 <!-- Navigation Controls -->
 <!--<div class="navigation">-->

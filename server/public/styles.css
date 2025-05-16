@@ -110,7 +110,7 @@ p {
 /* ===== CONTENT SLIDES ===== */
 #slideBasicPrompt,
 #slidePersonality,
-#slideVectorDB, #slideRAG, #slideCompleteAI {
+#slideVectorDB, #slideRAG, #slideCompleteAI, #slideSpeech {
     background-color: var(--color-background-dark);
 }
 
@@ -178,6 +178,7 @@ p {
     color: var(--color-ai-text);
     border: 1px solid var(--color-primary);
     border-radius: 5px;
+    text-align: center;
     padding: var(--spacing-medium);
     font-family: var(--font-monospace);
     margin-bottom: var(--spacing-medium);
@@ -945,6 +946,70 @@ p {
     }
 }
 
+/**
+ * Dr. House AI Assistant - Presentation Styles
+ *
+ * Adding specific styles for speech interface components
+ */
+
+/* Speech Interface Specific Styles */
+#slideSpeech .right-section {
+    flex-direction: column;
+    background-color: rgba(5, 27, 43, 0.7);
+    color: var(--color-ai-text);
+    font-family: var(--font-monospace);
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+#slideSpeech .chat-container {
+    border: 1px solid var(--color-accent);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    min-height: 300px;
+    max-height: 500px;
+    overflow-y: auto;
+    background-color: var(--color-background-dark);
+}
+
+#slideSpeech .message {
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    border-radius: 10px;
+    max-width: 80%;
+}
+
+#slideSpeech .user-message {
+    background-color: #2C3E50;
+    margin-left: auto;
+    text-align: right;
+}
+
+#slideSpeech .house-message {
+    background-color: #34495E;
+    margin-right: auto;
+    position: relative;
+}
+
+#slideSpeech .controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+#slideSpeech .status {
+    color: #7f7f7f;
+    margin: 10px 0;
+    font-style: italic;
+}
+
+#slideSpeech .audio-control {
+    cursor: pointer;
+    margin-left: 10px;
+    color: var(--color-accent);
+}
 /* Enhanced styling for interaction boxes */
 .input-box[contenteditable="true"] {
     min-height: 80px;

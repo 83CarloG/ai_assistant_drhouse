@@ -56,7 +56,7 @@ async function initializeChatHistoryIndex() {
 
         console.log(`Created chat history index ${CHAT_HISTORY_INDEX}`);
 
-        await client.closeConnection()
+        await closeConnection()
     } catch (error) {
         console.error('Error initializing chat history index:', error);
         throw error;
