@@ -31,7 +31,7 @@
 
             <div class="interaction-box">
                 <span class="user-label">Utente: </span>
-                <div class="input-box" id="promptBaseInput" contenteditable="true">Paziente con febbre alta, tosse persistente e dolori articolari. Quali sono le possibili diagnosi?</div>
+                <div class="input-box" id="promptBaseInput" contenteditable="true">Paziente con febbre alta, tosse persistente e dolori articolari. Quali medicinali potrei assumere?</div>
                 <button class="submit-button" onclick="processPrompt()">Invia</button>
 
                 <span class="user-label">Dr. House AI: </span>
@@ -90,7 +90,7 @@
 
             <div class="interaction-box wide-box">
                 <span class="user-label">Utente: </span>
-                <div class="input-box" contenteditable="true">Paziente con febbre alta, tosse persistente e dolori articolari. Quali sono le possibili diagnosi?</div>
+                <div class="input-box" contenteditable="true">Paziente con febbre alta, tosse persistente e dolori articolari. Quali medicinali potrei assumere?</div>
                 <button class="submit-button" onclick="processPrompt()">Invia</button>
                 <span class="user-label">Dr. House AI: </span>
                 <div class="output-box">Le risposte del Dr. House con personalità appariranno qui.</div>
@@ -194,6 +194,7 @@
         </div>
 
         <div class="right-section">
+
             <div class="rag-system-container">
                 <div class="rag-diagram">
                     <!-- Query Box -->
@@ -229,12 +230,17 @@
 
                     <div class="interaction-box wide-box">
                         <span class="user-label">Utente: </span>
-                        <div class="input-box" contenteditable="true">Paziente con febbre alta, tosse persistente e dolori articolari. Quali sono le possibili diagnosi?</div>
+                        <div class="input-box" contenteditable="true">Paziente con febbre alta, tosse persistente e dolori articolari. Quali medicinali potrei assumere?</div>
+
                         <button class="submit-button" onclick="processPrompt()">Invia</button>
+                        <br>
+                        <button id="showMedicalContextBtn" class="submit-button">Risultato Db Vettoriale</button>
                         <span class="user-label">Dr. House AI: </span>
                         <div class="output-box">Le risposte del Dr. House con RAG appariranno qui.</div>
                     </div>
+
                 </div>
+
             </div>
         </div>
     </div>
@@ -371,7 +377,14 @@
 <!--    <button id="prev-button" class="nav-button" onclick="prevSlide()" style="display: none;">Indietro</button>-->
 <!--    <button id="next-button" class="nav-button" onclick="nextSlide()">Avanti</button>-->
 <!--</div>-->
-
+<div id="medicalContextModal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <h2>Medical Context Data</h2>
+        <pre id="medicalContextText" class="modal-text"></pre>
+    </div>
+</div>
 <script src="script.js"></script>
+<script src="response-popup.js"></script>
 </body>
 </html>

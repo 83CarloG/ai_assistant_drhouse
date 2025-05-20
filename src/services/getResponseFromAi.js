@@ -44,7 +44,11 @@ module.exports = async function (prompt, enableDrHouse = false, ragEnabledHistor
             finalSystemInstruction = baseSystemInstruction;
 
         }
+
+        console.log(medicalQueryDetection(prompt))
+
         if (medicalQueryDetection(prompt) && ragEnabledMedicalContext) {
+
             const baseSystemInstruction = await readFile(
                 path.resolve(process.cwd(), "fixtures", "dataset_files", "system_instruction_rag.txt"),
                 {encoding: "utf-8"}
@@ -55,6 +59,8 @@ module.exports = async function (prompt, enableDrHouse = false, ragEnabledHistor
             await writeFile(path.resolve(process.cwd(), "currentPromptTranslate.txt"), response_translate.data.choices[0].message.content)
 
             const medicalContext = await retrieveMedicalContextOperation(response_translate.data.choices[0].message.content);
+
+            await  writeFile(path.resolve(process.cwd(), "server", "public", "assets","medicalContext.txt"), medicalContext)
 
             if (medicalContext) {
                 // Add medical context to the instruction
@@ -81,7 +87,7 @@ module.exports = async function (prompt, enableDrHouse = false, ragEnabledHistor
                 {"role": "system", "content": finalSystemInstruction},
                 {"role": "user", "content": prompt},
             ],
-            temperature: 0.2 // Slightly more deterministic for medical information
+            temperature: 0.4 // Slightly more deterministic for medical information
         });
 
         // Store the exchange in history

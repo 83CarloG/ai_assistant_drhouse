@@ -10,6 +10,8 @@
 let currentSlide = 1;
 const totalSlides = 8; // Updated to include the Speech slide
 
+
+
 // Slide ID mapping (for better code readability)
 const SLIDE_IDS = {
     HOME: 'slideHome',
@@ -52,6 +54,10 @@ function goToSlide(slideNumber) {
     // Initialize speech interface if we're on that slide
     if (targetSlideId === SLIDE_IDS.SPEECH) {
         setTimeout(initSpeechInterface, 100); // Piccolo ritardo per assicurarsi che il DOM sia pronto
+    }
+    // Initialize medical context modal if we're on the RAG slide
+    if (targetSlideId === SLIDE_IDS.RAG) {
+        setTimeout(setupMedicalContextModal, 100);
     }
 }
 
@@ -546,6 +552,54 @@ function playAudioFromUrl(url) {
     });
 }
 
+// Medical Context Modal functionality
+function setupMedicalContextModal() {
+    const showMedicalContextBtn = document.getElementById('showMedicalContextBtn');
+    const medicalContextModal = document.getElementById('medicalContextModal');
+    const medicalContextText = document.getElementById('medicalContextText');
+    const modalClose = document.querySelector('.modal-close');
+
+    // Only set up if we're on the right slide and elements exist
+    if (!showMedicalContextBtn || !medicalContextModal || !medicalContextText) {
+        return;
+    }
+
+    // Button click handler
+    showMedicalContextBtn.addEventListener('click', function() {
+        // Show loading state
+        medicalContextText.textContent = "Loading medical context...";
+        medicalContextModal.style.display = 'block';
+
+        // Fetch the medical context from the server
+        fetch('/medical-context')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Display the content
+                medicalContextText.textContent = data.content;
+            })
+            .catch(error => {
+                console.error('Error fetching medical context:', error);
+                medicalContextText.textContent = "Error loading medical context: " + error.message;
+            });
+    });
+
+    // Close button handler
+    modalClose.addEventListener('click', function() {
+        medicalContextModal.style.display = 'none';
+    });
+
+    // Close on outside click
+    window.addEventListener('click', function(event) {
+        if (event.target === medicalContextModal) {
+            medicalContextModal.style.display = 'none';
+        }
+    });
+}
 // Keyboard navigation event handler
 document.addEventListener('keydown', (e) => {
     switch (e.key) {
@@ -590,3 +644,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+

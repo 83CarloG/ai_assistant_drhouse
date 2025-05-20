@@ -142,6 +142,28 @@ module.exports = async function (fastify, openapi) {
             }
         });
 
+        instance.get("/medical-context", async (request, reply) => {
+            try {
+                const fs = require('fs').promises;
+                const path = require('path');
+
+                // Path to your medicalContext.txt file
+                const filePath = path.resolve(process.cwd(), "server", "public", "assets", "medicalContext.txt");
+
+                // Read the file
+                const content = await fs.readFile(filePath, 'utf8');
+
+                // Send the content
+                return reply.send({ content });
+            } catch (error) {
+                console.error("Error reading medical context file:", error);
+                return reply.status(500).send({
+                    error: "Failed to read medical context file",
+                    message: error.message
+                });
+            }
+        });
+
         done();
     });
 }

@@ -23,20 +23,24 @@ module.exports = async function (prompt, response) {
         const timestamp = Date.now();
         const exchangeId = `${CHAT_HISTORY_PREFIX}${timestamp}`;
 
+        // Remove any previous conversation history from the prompt
+        // This regex identifies the history section added by enhancePromptWithHistory
+        const cleanPrompt = prompt.replace(/\n\nHere is our previous conversation that might be relevant:\n\n[\s\S]*?Current query: (.*)/i, "$1");
+
         // Create embedding for similarity search later
-        const promptEmbedding = await createEmbedding(prompt);
+        const promptEmbedding = await createEmbedding(cleanPrompt);
         const vectorBuffer = Buffer.from(new Float32Array(promptEmbedding).buffer);
 
         // Create a combined text for potential text search
-        const combinedText = `User: ${prompt}\nAI: ${response}`;
+        const combinedText = `User: ${cleanPrompt}\nAI: ${response}`;
 
         // Store the exchange in Redis
         await client.hSet(exchangeId, {
-            prompt: prompt,
+            prompt: cleanPrompt, // Store only the clean prompt
             response: response,
             timestamp: timestamp.toString(),
             combined_text: combinedText,
-            prompt_vector: vectorBuffer  // For vector similarity search
+            prompt_vector: vectorBuffer
         });
 
         // Add to the ordered list for chronological access

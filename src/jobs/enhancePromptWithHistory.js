@@ -11,8 +11,6 @@ module.exports = async function (prompt)  {
         // Get relevant history based on the current prompt
         const relevantHistory = await chatHistory.getRelevantHistory(prompt, 3);
 
-
-
         if (!relevantHistory || relevantHistory.length === 0) {
             return prompt;
         }
@@ -30,8 +28,8 @@ module.exports = async function (prompt)  {
             historyContext += `You (Dr. House): ${exchange.response}\n\n`;
         });
 
-        // Combine with the current prompt
-        historyContext += `\nCurrent query: ${prompt}`;
+        // Add a clear marker before the current prompt
+        historyContext += `Current query: ${prompt}`;
         return historyContext;
     } catch (error) {
         console.error('Error enhancing prompt with history:', error);
