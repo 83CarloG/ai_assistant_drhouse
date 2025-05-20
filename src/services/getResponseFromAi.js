@@ -73,7 +73,10 @@ module.exports = async function (prompt, enableDrHouse = false, ragEnabledHistor
         });
 
         // Store the exchange in history
-        await chatHistory.storeExchangeHistory(prompt, response.data.choices[0].message.content);
+        if(ragEnabledHistoryChat) {
+            await chatHistory.storeExchangeHistory(prompt, response.data.choices[0].message.content);
+        }
+
 
         return {
             data: response.data.choices[0].message.content,
