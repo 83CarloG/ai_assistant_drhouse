@@ -116,6 +116,8 @@
                     <li>I farmaci vengono convertiti in vettori numerici (<span style="text-decoration: underline;">embedding</span>)</li>
                     <li>Ogni medicinale è rappresentato come un punto in uno spazio multidimensionale</li>
                     <li>Farmaci con effetti simili si trovano vicini in questo spazio</li>
+                    <li>Il nostro sistema utilizza un database di 11.000 medicinali</li>
+                    <li>Memorizziamo anche lo storico delle conversazioni come vettori</li>
                 </ol>
             </div>
         </div>
@@ -184,7 +186,7 @@
                 <h3 class="sub-section-title">Come funziona:</h3>
                 <ol class="feature-list">
                     <li>I sintomi forniti dal paziente vengono trasformati in un vettore semantico</li>
-                    <li>Il sistema effettua una ricerca di casi clinici simili in un database vettoriale</li>
+                    <li>Il sistema effettua una ricerca di medicinali pertinenti nel database vettoriale di 11.000 farmaci</li>
                     <li>Consulta lo storico delle conversazioni precedenti con il paziente</li>
                     <li>L'IA elabora una risposta integrando le informazioni recuperate e il contesto attuale</li>
                 </ol>
@@ -205,7 +207,7 @@
                     <!-- RAG Process Area -->
                     <div class="rag-process-area">
                         <div class="rag-literature-box">
-                            <div class="rag-box-title">Letteratura Medica</div>
+                            <div class="rag-box-title">DB Farmaci</div>
                             <br>
                             <div class="rag-box-title">Storico chat</div>
                             <div class="rag-horizontal-line rag-line-right"></div>
@@ -215,14 +217,14 @@
 
                         <div class="rag-diagnosis-box">
                             <div class="rag-horizontal-line rag-line-left"></div>
-                            <div class="rag-box-title">Diagnosi</div>
+                            <div class="rag-box-title">Risposta</div>
                         </div>
                     </div>
 
                     <!-- Database Section -->
                     <div class="rag-database-section">
                         <div class="rag-database-title">Database:</div>
-                        <div class="rag-database-content">[Casi clinici rari, Studi su avvelenamenti, Articoli su malattie tropicali, Letteratura su malattie autoimmuni...]</div>
+                        <div class="rag-database-content">[Database di 11.000 medicinali, Storico delle conversazioni]</div>
                     </div>
 
                     <div class="interaction-box wide-box">
@@ -293,9 +295,9 @@
                 <ul class="feature-list">
                     <li><strong>Prompt Base:</strong> Gestisce l'interazione diagnostica fondamentale</li>
                     <li><strong>Tono e Caratteristiche:</strong> Comunica con il sarcasmo di House</li>
-                    <li><strong>Database Vettoriale:</strong> Contiene vasta letteratura medica e casi rari</li>
-                    <li><strong>Memoria Conversazionale:</strong> Ricorda gli sviluppi del caso in corso</li>
-                    <li><strong>Sistema RAG:</strong> Recupera casi clinici simili e ricerca medica</li>
+                    <li><strong>Database Vettoriale:</strong> Contiene 11.000 medicinali con le loro proprietà</li>
+                    <li><strong>Memoria Conversazionale:</strong> Ricorda le conversazioni precedenti con l'utente</li>
+                    <li><strong>Sistema RAG:</strong> Recupera medicinali pertinenti e informazioni dalle conversazioni passate</li>
                     <li><strong>Interfaccia Vocale:</strong> Permette interazioni parlate con riconoscimento e sintesi vocale</li>
 
                 </ul>
