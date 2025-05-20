@@ -25,7 +25,7 @@ module.exports = async function (prompt, enableDrHouse = false, ragEnabledHistor
         let finalSystemInstruction = "";
 
         // Read the Dr. House system instruction
-        if (enableDrHouse) {
+        if (enableDrHouse &&  !ragEnabledMedicalContext) {
 
             const baseSystemInstruction = await readFile(
                 path.resolve(process.cwd(), "fixtures", "dataset_files", "system_instruction.txt"),
