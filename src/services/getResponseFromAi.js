@@ -19,7 +19,7 @@ const medicalQueryDetection = require(path.resolve(process.cwd(), "src", "featur
  */
 
 module.exports = async function (prompt, enableDrHouse = false, ragEnabledHistoryChat = false, ragEnabledMedicalContext = false, userSelectedModel = config.MISTRAL_DEFAULT_MODEL,) {
-    console.log(prompt, userSelectedModel, enableDrHouse, ragEnabledHistoryChat, ragEnabledMedicalContext);
+    //console.log(prompt, userSelectedModel, enableDrHouse, ragEnabledHistoryChat, ragEnabledMedicalContext);
     try {
         const url = "/chat/completions";
         let finalSystemInstruction = "";
@@ -36,6 +36,12 @@ module.exports = async function (prompt, enableDrHouse = false, ragEnabledHistor
 
         }
         if (medicalQueryDetection(prompt) && ragEnabledMedicalContext) {
+            const baseSystemInstruction = await readFile(
+                path.resolve(process.cwd(), "fixtures", "dataset_files", "system_instruction_rag.txt"),
+                {encoding: "utf-8"}
+            );
+
+            finalSystemInstruction = baseSystemInstruction;
             const medicalContext = await retrieveMedicalContextOperation(prompt);
 
             if (medicalContext) {
@@ -44,7 +50,7 @@ module.exports = async function (prompt, enableDrHouse = false, ragEnabledHistor
             }
         }
 
-        if(ragEnabledMedicalContext) {
+        if(ragEnabledHistoryChat) {
             // Enhance prompt with relevant conversation history
             prompt = await enhancePromptWithHistoryJob(prompt);
         }

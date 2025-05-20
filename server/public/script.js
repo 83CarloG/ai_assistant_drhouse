@@ -67,8 +67,8 @@ function getSlideIdByNumber(number) {
         case 3: return SLIDE_IDS.PERSONALITY;
         case 4: return SLIDE_IDS.VECTOR_DB;
         case 5: return SLIDE_IDS.RAG;
-        case 6: return SLIDE_IDS.COMPLETE_AI;
-        case 7: return SLIDE_IDS.SPEECH;
+        case 6: return SLIDE_IDS.SPEECH;
+        case 7: return SLIDE_IDS.COMPLETE_AI;
         case 8: return SLIDE_IDS.LAST_SLIDE;
         default: return SLIDE_IDS.HOME;
     }
