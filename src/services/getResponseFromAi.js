@@ -24,6 +24,15 @@ module.exports = async function (prompt, enableDrHouse = false, ragEnabledHistor
         const url = "/chat/completions";
         let finalSystemInstruction = "";
 
+        const response_translate = await httpDriver.post(url, {
+            model: userSelectedModel,
+            messages: [
+                {"role": "system", "content": "You are a translation assistant. Translate everything the user says into English, and nothing else."},
+                {"role": "user", "content": prompt},
+            ],
+            temperature: 0.2 // Slightly more deterministic for medical information
+        });
+
         // Read the Dr. House system instruction
         if (enableDrHouse &&  !ragEnabledMedicalContext) {
 
@@ -42,7 +51,10 @@ module.exports = async function (prompt, enableDrHouse = false, ragEnabledHistor
             );
 
             finalSystemInstruction = baseSystemInstruction;
-            const medicalContext = await retrieveMedicalContextOperation(prompt);
+
+            await writeFile(path.resolve(process.cwd(), "currentPromptTranslate.txt"), response_translate.data.choices[0].message.content)
+
+            const medicalContext = await retrieveMedicalContextOperation(response_translate.data.choices[0].message.content);
 
             if (medicalContext) {
                 // Add medical context to the instruction
@@ -84,9 +96,16 @@ module.exports = async function (prompt, enableDrHouse = false, ragEnabledHistor
         };
     } catch (error) {
         console.error("Error in AI response:", error.message);
-        return error.response || {
-            data: "I'm sorry, I'm having trouble accessing my medical database right now.",
-            status: 500
-        };
+        if (error.response && error.response.data) {
+            return {
+                data: error.response.data,
+                status: error.response.status || 500
+            };
+        } else {
+            return {
+                data: "I'm sorry, I'm having trouble accessing my medical database right now.",
+                status: 500
+            };
+        }
     }
 };
