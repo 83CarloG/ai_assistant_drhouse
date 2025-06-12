@@ -6,6 +6,7 @@ const { readFile, writeFile } = require("fs/promises");
 
 const config = require(path.resolve(process.cwd(), "config"));
 const httpDriver = require(path.resolve(process.cwd(), "drivers", "http"));
+const ollamaDriver = require(path.resolve(process.cwd(), "drivers", "ollama"));
 const chatHistory = require(path.resolve(process.cwd(), "src", "operations", "chatHistory"));
 const enhancePromptWithHistoryJob = require(path.resolve(process.cwd(), "src", "jobs", "enhancePromptWithHistory"));
 const retrieveMedicalContextOperation = require(path.resolve(process.cwd(),"src", "operations", "retrieveMedicalContext"));
@@ -24,14 +25,41 @@ module.exports = async function (prompt, enableDrHouse = false, ragEnabledHistor
         const url = "/chat/completions";
         let finalSystemInstruction = "";
 
-        const response_translate = await httpDriver.post(url, {
-            model: userSelectedModel,
-            messages: [
-                {"role": "system", "content": "You are a translation assistant. Translate everything the user says into English, and nothing else."},
-                {"role": "user", "content": prompt},
-            ],
-            temperature: 0.2 // Slightly more deterministic for medical information
-        });
+        // const response_translate = await httpDriver.post(url, {
+        //     model: userSelectedModel,
+        //     messages: [
+        //         {"role": "system", "content": "You are a translation assistant. Translate everything the user says into English, and nothing else."},
+        //         {"role": "user", "content": prompt},
+        //     ],
+        //     temperature: 0.2 // Slightly more deterministic for medical information
+        // });
+
+        let translatedPrompt;
+        try {
+            // Try Ollama first for translation
+            translatedPrompt = await ollamaDriver.translateText(prompt);
+            console.log('Translation completed using Ollama');
+        } catch (ollamaError) {
+            console.log('Ollama translation failed, falling back to Mistral:', ollamaError.message);
+
+            // Fallback to Mistral for translation
+            try {
+                const response_translate = await httpDriver.post(url, {
+                    model: userSelectedModel,
+                    messages: [
+                        {"role": "system", "content": "You are a translation assistant. Translate everything the user says into English, and nothing else."},
+                        {"role": "user", "content": prompt},
+                    ],
+                    temperature: 0.2
+                });
+                translatedPrompt = response_translate.data.choices[0].message.content;
+                console.log('Translation completed using Mistral fallback');
+            } catch (mistralError) {
+                console.error('Both Ollama and Mistral translation failed:', mistralError.message);
+                // Use original prompt if both fail
+                translatedPrompt = prompt;
+            }
+        }
 
         // Read the Dr. House system instruction
         if (enableDrHouse &&  !ragEnabledMedicalContext) {
@@ -56,9 +84,12 @@ module.exports = async function (prompt, enableDrHouse = false, ragEnabledHistor
 
             finalSystemInstruction = baseSystemInstruction;
 
-            await writeFile(path.resolve(process.cwd(), "currentPromptTranslate.txt"), response_translate.data.choices[0].message.content)
+            //await writeFile(path.resolve(process.cwd(), "currentPromptTranslate.txt"), response_translate.data.choices[0].message.content)
+            await writeFile(path.resolve(process.cwd(), "currentPromptTranslate.txt"), translatedPrompt)
 
-            const medicalContext = await retrieveMedicalContextOperation(response_translate.data.choices[0].message.content);
+
+            // const medicalContext = await retrieveMedicalContextOperation(response_translate.data.choices[0].message.content);
+            const medicalContext = await retrieveMedicalContextOperation(translatedPrompt);
 
             await  writeFile(path.resolve(process.cwd(), "server", "public", "assets","medicalContext.txt"), medicalContext)
 
