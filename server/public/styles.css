@@ -1180,3 +1180,31 @@ p {
     color: var(--color-ai-text);
     overflow-x: auto;
 }
+
+
+
+.audio-controls-container {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 10px;
+}
+
+.audio-control {
+    cursor: pointer;
+    margin-right: 5px;
+    color: var(--color-accent);
+    font-size: 1.2em;
+    padding: 0 3px;
+}
+
+.play-audio {
+    color: #4CAF50; /* Green for play */
+}
+
+.stop-audio {
+    color: #FF5733; /* Red for stop */
+}
+
+.audio-control:hover {
+    opacity: 0.8;
+}

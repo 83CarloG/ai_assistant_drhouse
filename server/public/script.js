@@ -9,6 +9,7 @@
 // Global variables
 let currentSlide = 1;
 const totalSlides = 8; // Updated to include the Speech slide
+let currentAudio = null;
 
 
 
@@ -356,6 +357,55 @@ function initSpeechInterface() {
     console.log("Speech interface initialized successfully");
 }
 
+function stopSpeechAudio() {
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
+}
+function addSpeechMessage(text, sender) {
+    const speechChatContainer = document.getElementById('speechChatContainer');
+    if (!speechChatContainer) {
+        console.error("Speech chat container not found!");
+        return;
+    }
+
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}-message`;
+    messageDiv.textContent = text;
+
+    // Add audio controls for House messages
+    if (sender === 'house') {
+        // Create a control container
+        const audioControlsContainer = document.createElement('span');
+        audioControlsContainer.className = 'audio-controls-container';
+
+        // Play button
+        const playButton = document.createElement('span');
+        playButton.className = 'audio-control play-audio';
+        playButton.innerHTML = '🔊';
+        playButton.title = 'Riproduci audio';
+        playButton.onclick = function() {
+            playSpeechAudio(text);
+        };
+
+        // Stop button
+        const stopButton = document.createElement('span');
+        stopButton.className = 'audio-control stop-audio';
+        stopButton.innerHTML = '⏹️';
+        stopButton.title = 'Ferma audio';
+        stopButton.onclick = function() {
+            stopSpeechAudio();
+        };
+
+        audioControlsContainer.appendChild(playButton);
+        audioControlsContainer.appendChild(stopButton);
+        messageDiv.appendChild(audioControlsContainer);
+    }
+
+    speechChatContainer.appendChild(messageDiv);
+    speechChatContainer.scrollTop = speechChatContainer.scrollHeight;
+}
 /**
  * Start speech recognition
  */
@@ -438,34 +488,53 @@ function clearSpeechChat() {
  * @param {string} text - Message text
  * @param {string} sender - 'user' or 'house'
  */
-function addSpeechMessage(text, sender) {
-    const speechChatContainer = document.getElementById('speechChatContainer');
-    if (!speechChatContainer) {
-        console.error("Speech chat container not found!");
-        return;
+// Find this function in your script.js file and replace it with the code below
+function playSpeechAudio(text) {
+    console.log("Playing speech audio for text:", text.substring(0, 30) + "...");
+
+    // Stop any currently playing audio
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
     }
 
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${sender}-message`;
-    messageDiv.textContent = text;
+    fetch('/speech/generate', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ text })
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.status);
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            const url = URL.createObjectURL(blob);
+            const audio = new Audio(url);
 
-    // Add audio control for House messages
-    if (sender === 'house') {
-        const audioControl = document.createElement('span');
-        audioControl.className = 'audio-control';
-        audioControl.innerHTML = '🔊';
-        audioControl.title = 'Riproduci audio';
-        audioControl.onclick = function() {
-            playSpeechAudio(text);
-        };
-        messageDiv.appendChild(audioControl);
-    }
+            // Store the audio in our global variable
+            currentAudio = audio;
 
-    speechChatContainer.appendChild(messageDiv);
-    speechChatContainer.scrollTop = speechChatContainer.scrollHeight;
+            // Add event listener for when audio ends
+            audio.addEventListener('ended', function() {
+                currentAudio = null;
+            });
+
+            // Play the audio
+            audio.play();
+        })
+        .catch(error => {
+            console.error('Error playing audio:', error);
+        });
 }
 
+
+
 /**
+
  * Send a prompt to the AI for speech processing
  * @param {string} prompt - User's prompt
  */
@@ -509,40 +578,7 @@ function sendToSpeechAI(prompt) {
         });
 }
 
-/**
- * Play speech audio from text
- * @param {string} text - Text to convert to speech
- */
-function playSpeechAudio(text) {
-    console.log("Playing speech audio for text:", text.substring(0, 30) + "...");
 
-    fetch('/speech/generate', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ text })
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok: ' + response.status);
-            }
-            return response.blob();
-        })
-        .then(blob => {
-            const url = URL.createObjectURL(blob);
-            const audio = new Audio(url);
-            audio.play();
-        })
-        .catch(error => {
-            console.error('Error playing audio:', error);
-        });
-}
-
-/**
- * Play audio from a URL
- * @param {string} url - Audio URL
- */
 function playAudioFromUrl(url) {
     console.log("Playing audio from URL:", url);
 

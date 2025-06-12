@@ -87,7 +87,9 @@ module.exports = async function (prompt, enableDrHouse = false, ragEnabledHistor
                 {"role": "system", "content": finalSystemInstruction},
                 {"role": "user", "content": prompt},
             ],
-            temperature: 0.4 // Slightly more deterministic for medical information
+            temperature: 0.6,  // Slightly more deterministic for medical information
+            top_p: 0.7
+
         });
 
         // Store the exchange in history

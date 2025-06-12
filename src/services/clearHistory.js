@@ -3,7 +3,7 @@
 "use strict";
 
 const path = require('path');
-const { getClient } = require(path.resolve(process.cwd(), 'drivers', 'redis'));
+const { getClient, closeConnection } = require(path.resolve(process.cwd(), 'drivers', 'redis'));
 
 
 // Constants
@@ -23,7 +23,7 @@ async function clearHistory() {
 
         // Delete the list
         await client.del(CHAT_HISTORY_LIST);
-
+        await closeConnection()
         console.log('Chat history cleared');
     } catch (error) {
         console.error('Error clearing chat history:', error);

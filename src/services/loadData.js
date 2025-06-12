@@ -5,25 +5,13 @@ const fs = require('fs');
 const csv = require('csvtojson');
 const { SchemaFieldTypes } = require('@redis/search');
 const config = require(path.resolve(process.cwd(), "config"));
-
-// Import dependencies
-const localEmbeddingsPath = path.resolve(process.cwd(), 'drivers', 'localEmbeddings.js');
-if (!fs.existsSync(localEmbeddingsPath)) {
-    console.error(`Error: Embeddings driver not found at ${localEmbeddingsPath}`);
-    process.exit(1);
-}
-const { createEmbedding } = require(localEmbeddingsPath);
-
-const redisClientPath = path.resolve(process.cwd(), 'drivers', 'redis.js');
-if (!fs.existsSync(redisClientPath)) {
-    console.error(`Error: Redis driver not found at ${redisClientPath}`);
-    process.exit(1);
-}
-const { getClient } = require(redisClientPath);
+const { createEmbedding } = require(path.resolve(process.cwd(), 'drivers', 'localEmbeddings'));
+const { getClient } = require(path.resolve(process.cwd(), 'drivers', 'redis'));
 
 // Constants
 const MEDICINE_INDEX = 'medicine_idx';
 const DOC_PREFIX = 'medicine:';
+const BATCH_SIZE = 100; // Aumentato significativamente dai 5 originali
 
 async function createIndex(client) {
     try {
@@ -44,46 +32,42 @@ async function createIndex(client) {
             console.log(`No existing index found to drop`);
         }
 
-        // Create vector index with schema matching the new dataset structure
-        try {
-            await client.ft.create(MEDICINE_INDEX, {
-                name: {
-                    type: SchemaFieldTypes.TEXT,
-                    sortable: true
-                },
-                composition: {
-                    type: SchemaFieldTypes.TEXT,
-                },
-                uses: {
-                    type: SchemaFieldTypes.TEXT,
-                },
-                side_effects: {
-                    type: SchemaFieldTypes.TEXT,
-                },
-                manufacturer: {
-                    type: SchemaFieldTypes.TAG,
-                    sortable: true
-                },
-                combined_text: {
-                    type: SchemaFieldTypes.TEXT,
-                },
-                content_vector: {
-                    type: SchemaFieldTypes.VECTOR,
-                    ALGORITHM: 'HNSW',
-                    TYPE: 'FLOAT32',
-                    DIM: config.VECTOR_DIMENSION || 384,
-                    DISTANCE_METRIC: 'COSINE'
-                }
-            }, {
-                ON: 'HASH',
-                PREFIX: DOC_PREFIX
-            });
+        // Create vector index with schema - versione semplificata
+        await client.ft.create(MEDICINE_INDEX, {
+            name: {
+                type: SchemaFieldTypes.TEXT,
+                sortable: true
+            },
+            composition: {
+                type: SchemaFieldTypes.TEXT,
+            },
+            uses: {
+                type: SchemaFieldTypes.TEXT,
+                WEIGHT: 5.0  // Manteniamo il peso maggiore per il campo uses
+            },
+            side_effects: {
+                type: SchemaFieldTypes.TEXT,
+            },
+            manufacturer: {
+                type: SchemaFieldTypes.TAG,
+                sortable: true
+            },
+            combined_text: {
+                type: SchemaFieldTypes.TEXT,
+            },
+            content_vector: {
+                type: SchemaFieldTypes.VECTOR,
+                ALGORITHM: 'HNSW',
+                TYPE: 'FLOAT32',
+                DIM: config.VECTOR_DIMENSION || 384,
+                DISTANCE_METRIC: 'COSINE'
+            }
+        }, {
+            ON: 'HASH',
+            PREFIX: DOC_PREFIX
+        });
 
-            console.log(`Created index: ${MEDICINE_INDEX}`);
-        } catch (err) {
-            console.error('Error creating index:', err);
-            throw err;
-        }
+        console.log(`Created index: ${MEDICINE_INDEX}`);
     } catch (err) {
         console.error('Error setting up index:', err);
         throw err;
@@ -110,82 +94,93 @@ async function processData() {
 
         // Load data
         console.log(`Loading data from ${csvFilePath}...`);
+
+        // Elabora il CSV in un array completo
         const jsonArray = await csv().fromFile(csvFilePath);
-
         console.log(`Loaded ${jsonArray.length} records from CSV`);
-        console.log('Processing and storing records...');
 
-        // Process in smaller batches for local embedding
-        const BATCH_SIZE = 5;
+        // Numero totale di record da processare
+        const recordsToProcess = jsonArray;
+        const totalCount = recordsToProcess.length;
+        console.log(`Processing ${totalCount} records in batches of ${BATCH_SIZE}...`);
+
         let count = 0;
+        const startTime = Date.now();
 
-        console.log(jsonArray.length)
-        // Process a subset for testing (you can increase this later)
-        const recordsToProcess = jsonArray.slice(0, jsonArray.length);
-        console.log(`Processing ${recordsToProcess.length} records...`);
-
+        // Processo batch per batch
         for (let i = 0; i < recordsToProcess.length; i += BATCH_SIZE) {
+            const batchStartTime = Date.now();
             const batch = recordsToProcess.slice(i, i + BATCH_SIZE);
 
-            // Create combined texts for each record in the batch
-            const combinedTexts = batch.map(record =>
-                `Name: ${record['Medicine Name'] || 'N/A'}. Composition: ${record.Composition || 'N/A'}. Uses: ${record.Uses || 'N/A'}. Side Effects: ${record.Side_effects || 'N/A'}. Manufacturer: ${record.Manufacturer || 'N/A'}.`
-            );
+            // Prepara testi e crea un array di promesse per le pipeline
+            const combinedTexts = batch.map(record => {
+                // Forma semplificata del combinedText - enfatizziamo solo gli usi
+                return `Name: ${record['Medicine Name'] || 'N/A'}. ` +
+                    `Composition: ${record.Composition || 'N/A'}. ` +
+                    `Uses: ${record.Uses || 'N/A'}. ${record.Uses || 'N/A'}. ` + // Duplicato per enfasi
+                    `Side Effects: ${record.Side_effects || 'N/A'}. ` +
+                    `Manufacturer: ${record.Manufacturer || 'N/A'}.`;
+            });
 
             try {
-                // Generate embeddings in batch
-                console.log(`Generating embeddings for batch ${Math.floor(i/BATCH_SIZE) + 1}...`);
+                // Genera gli embedding in un singolo batch
+                console.log(`Generating embeddings for batch ${Math.floor(i/BATCH_SIZE) + 1}/${Math.ceil(totalCount/BATCH_SIZE)}...`);
                 const embeddings = await createEmbedding(combinedTexts);
-                console.log(`Successfully generated ${embeddings.length} embeddings`);
 
-                // Store each record with its embedding
-                console.log(`Storing batch ${Math.floor(i/BATCH_SIZE) + 1} in Redis...`);
+                // Crea pipeline Redis per inserimento in batch
+                let pipeline = client.multi();
+
                 for (let idx = 0; idx < batch.length; idx++) {
                     const docId = `${DOC_PREFIX}${i + idx}`;
                     const record = batch[idx];
                     const combinedText = combinedTexts[idx];
                     const embedding = embeddings[idx];
 
-                    try {
-                        // Convert embedding to a buffer for Redis storage
-                        const vectorBuffer = Buffer.from(new Float32Array(embedding).buffer);
+                    // Converti l'embedding in un buffer per Redis
+                    const vectorBuffer = Buffer.from(new Float32Array(embedding).buffer);
 
-                        await client.hSet(docId, {
-                            name: record['Medicine Name'] || '',
-                            composition: record.Composition || '',
-                            uses: record.Uses || '',
-                            side_effects: record.Side_effects || '',
-                            manufacturer: record.Manufacturer || '',
-                            combined_text: combinedText,
-                            content_vector: vectorBuffer
-                        });
-
-                        count++;
-                        console.log(`Stored document ${docId}`);
-                    } catch (docError) {
-                        console.error(`Error storing document ${docId}:`, docError);
-                    }
+                    // Aggiungi alla pipeline
+                    pipeline.hSet(docId, {
+                        name: record['Medicine Name'] || '',
+                        composition: record.Composition || '',
+                        uses: record.Uses || '',
+                        side_effects: record.Side_effects || '',
+                        manufacturer: record.Manufacturer || '',
+                        combined_text: combinedText,
+                        content_vector: vectorBuffer
+                    });
                 }
 
-                console.log(`Processed ${count} records so far...`);
+                // Esegui la pipeline come operazione atomica
+                await pipeline.exec();
+                count += batch.length;
+
+                const batchTime = Date.now() - batchStartTime;
+                const recordsPerSecond = Math.round((batch.length / batchTime) * 1000);
+                const progress = Math.round((count / totalCount) * 100);
+                const timeLeft = Math.round(((totalCount - count) / recordsPerSecond));
+
+                console.log(`Batch ${Math.floor(i/BATCH_SIZE) + 1}/${Math.ceil(totalCount/BATCH_SIZE)} complete. ` +
+                    `Progress: ${progress}% (${count}/${totalCount}). ` +
+                    `Speed: ${recordsPerSecond} records/sec. ` +
+                    `Est. time left: ${timeLeft} seconds.`);
+
             } catch (error) {
                 console.error(`Error processing batch ${Math.floor(i/BATCH_SIZE) + 1}:`, error);
                 console.log('Continuing with next batch...');
             }
-
-            // Add a small delay between batches
-            await new Promise(resolve => setTimeout(resolve, 1000));
         }
 
-        console.log(`Successfully processed and stored ${count} records`);
+        const totalTime = (Date.now() - startTime) / 1000;
+        console.log(`Successfully processed and stored ${count} records in ${totalTime} seconds (${Math.round(count/totalTime)} records/sec)`);
 
-        // Verify data was stored correctly
+        // Verifica dati
         console.log('Verifying data was stored correctly...');
         const info = await client.ft.info(MEDICINE_INDEX);
         console.log(`Index now has ${info.numDocs} documents`);
 
+        // Esempio di ricerca
         if (info.numDocs > 0) {
-            // Try a simple search to verify
             const results = await client.ft.search(
                 MEDICINE_INDEX,
                 '*',
@@ -198,7 +193,7 @@ async function processData() {
             }
         }
 
-        // Close connection
+        // Chiudi connessione
         if (client) {
             await client.quit();
             console.log('Disconnected from Redis');
@@ -213,6 +208,6 @@ async function processData() {
     }
 }
 
-// Run the function
+// Avvia il processo
 console.log('Starting data loading process...');
 processData();
